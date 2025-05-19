@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workers Management</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f0f2f5;
+        }
+
+        /* Login Page Styles */
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .login-form {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            width: 350px;
+            transform: translateY(-20px);
+            animation: slideUp 0.5s ease forwards;
+        }
+
+        @keyframes slideUp {
+            to {
+                transform: translateY(0);
+            }
+        }
+
+        .login-form h1 {
+            text-align: center;
+            color: #2d3748;
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #4a5568;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 0.8rem;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .login-btn:hover {
+            background: #5a67d8;
+            transform: translateY(-1px);
+        }
+
+        /* Dashboard Styles */
+        .dashboard {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: #2d3748;
+            color: white;
+            position: fixed;
+            height: 100%;
+            padding: 1rem;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar-header {
+            padding: 1rem;
+            border-bottom: 1px solid #4a5568;
+            margin-bottom: 1rem;
+        }
+
+        .sidebar-header h2 {
+            color: #fff;
+            font-size: 1.5rem;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .menu-item {
+            padding: 0.8rem;
+            margin: 0.5rem 0;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            color: #cbd5e0;
+        }
+
+        .menu-item:hover {
+            background: #4a5568;
+            color: #fff;
+        }
+
+        .menu-item.active {
+            background: #667eea;
+            color: #fff;
+        }
+
+        .menu-item i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .main-content {
+            margin-left: 250px;
+            padding: 2rem;
+            width: calc(100% - 250px);
+        }
+
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .content-header h1 {
+            color: #2d3748;
+            font-size: 1.8rem;
+        }
+
+        .logout-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logout-btn:hover {
+            background: #5a67d8;
+            transform: translateY(-1px);
+        }
+
+        .table-container {
+            max-height: 400px;
+            overflow-y: auto;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            background: white;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead th {
+            position: sticky;
+            top: 0;
+            background-color: #667eea;
+            color: white;
+            padding: 12px;
+            z-index: 1;
+        }
+
+        tbody td {
+            padding: 12px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        tr:hover {
+            background-color: #f1f5f9;
+        }
+
+        .action-btn {
+            border: none;
+            padding: 6px 12px;
+            margin-right: 5px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+
+        .view-btn {
+            background: #4299e1;
+            color: white;
+        }
+
+        .view-btn:hover {
+            background: #3182ce;
+        }
+
+        .edit-btn {
+            background: #48bb78;
+            color: white;
+        }
+
+        .edit-btn:hover {
+            background: #38a169;
+        }
+
+        .delete-btn {
+            background: #f56565;
+            color: white;
+        }
+
+        .delete-btn:hover {
+            background: #e53e3e;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            width: 90%;
+            max-width: 600px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            animation: fadeIn 0.3s ease-in-out;
+            position: relative;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin: 0;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #718096;
+            transition: color 0.2s ease;
+        }
+
+        .close-btn:hover {
+            color: #2d3748;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #4a5568;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            outline: none;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background-color: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #5a67d8;
+        }
+
+        .btn-secondary {
+            background-color: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .btn-secondary:hover {
+            background-color: #cbd5e0;
+        }
+
+        .worker-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .detail-item {
+            margin-bottom: 1rem;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: #4a5568;
+            margin-bottom: 0.25rem;
+        }
+
+        .detail-value {
+            color: #2d3748;
+            padding: 0.5rem;
+            background: #f7fafc;
+            border-radius: 4px;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+                padding: 1rem;
+            }
+
+            .sidebar {
+                display: none;
+            }
+
+            .worker-details {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .modal-content {
+                width: 95%;
+                padding: 1.5rem;
+            }
+
+            .content-header h1 {
+                font-size: 1.4rem;
+            }
+
+            .action-btn {
+                margin-bottom: 6px;
+                display: block;
+                width: 100%;
+                margin-right: 0;
+                margin-top: 5px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="dashboard">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>Admin Panel</h2>
+            </div>
+            <ul class="sidebar-menu">
+                <li class="menu-item" onclick="window.location.href='dashboard.html'"><i class="fas fa-home"></i> Home
+                </li>
+                <li class="menu-item" onclick="window.location.href='services.html'"><i
+                        class="fas fa-concierge-bell"></i> Services</li>
+                <li class="menu-item active" onclick="window.location.href='workers.html'"><i class="fas fa-users"></i>
+                    Workers</li>
+                <li class="menu-item" onclick="window.location.href='orders.html'"><i class="fas fa-clipboard-list"></i>
+                    Orders</li>
+                <li class="menu-item " onclick="window.location.href='promotions.html'"><i
+                        class="fas fa-clipboard-list"></i>Promotions</li>
+                <li class="menu-item" onclick="window.location.href='banner.html'">
+                    <i class="fas fa-image"></i>
+                    <span>banner Upload</span>
+                </li>
+                <li class="menu-item" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</li>
+            </ul>
+        </div>
+
+        <div class="main-content">
+            <div class="content-header">
+                <h1>Workers Management</h1>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Category</th>
+                            <th>Experience</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="workersTableBody">
+                        <!-- Workers will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Worker Modal -->
+    <div class="modal" id="workerModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Worker Details</h3>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="worker-details" id="workerDetails">
+                <!-- Worker details will be loaded here -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Worker Modal -->
+    <div class="modal" id="editWorkerModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Edit Worker</h3>
+                <button class="close-btn" onclick="closeEditModal()">&times;</button>
+            </div>
+            <form id="editWorkerForm">
+                <div class="form-group">
+                    <label for="editName">Name</label>
+                    <input type="text" id="editName" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="editEmail">Email</label>
+                    <input type="email" id="editEmail" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="editNumber">Phone</label>
+                    <input type="text" id="editNumber" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="editCategory">Category</label>
+                    <input type="text" id="editCategory" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="editExperience">Experience</label>
+                    <input type="text" id="editExperience" class="form-control" required>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const BASE_URL = 'https://5134-2401-4900-1c27-9d34-258e-e24-111f-6129.ngrok-free.app/api/v1';
+
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            localStorage.removeItem('isLoggedIn');
+            window.location.href = 'index.html';
+        });
+
+        if (!localStorage.getItem('isLoggedIn')) {
+            window.location.href = 'index.html';
+        }
+
+        async function fetchWorkers() {
+            try {
+                const headers = {
+                    'Accept': 'application/json',
+                    'ngrok-skip-browser-warning': 'true'
+                };
+
+                const res = await fetch(`${BASE_URL}/workers`, {
+                    method: 'GET',
+                    headers: headers
+                });
+
+                if (!res.ok) {
+                    throw new Error(`HTTP error! status: ${res.status}`);
+                }
+
+                const workers = await res.json();
+                const tbody = document.getElementById('workersTableBody');
+                tbody.innerHTML = '';
+
+                workers.forEach(worker => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${worker.name}</td>
+                            <td>${worker.category}</td>
+                            <td>${worker.experience}</td>
+                            <td>
+                                <button class="action-btn view-btn" onclick="viewWorker('${worker.id}')">View</button>
+                                <button class="action-btn edit-btn" onclick="editWorker('${worker.id}')">Edit</button>
+                                <button class="action-btn delete-btn" onclick="deleteWorker('${worker.id}')">Delete</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            } catch (err) {
+                alert('Failed to load workers');
+                console.error('❌ Worker fetch failed:', err);
+            }
+        }
+
+        async function viewWorker(id) {
+            try {
+                const headers = {
+                    'Accept': 'application/json',
+                    'ngrok-skip-browser-warning': 'true'
+                };
+
+                const res = await fetch(`${BASE_URL}/workers`, {
+                    method: 'GET',
+                    headers: headers
+                });
+
+                if (!res.ok) {
+                    throw new Error(`HTTP error! Status: ${res.status}`);
+                }
+
+                const data = await res.json();
+                const worker = data.find(w => w.id === id);
+
+                if (!worker) {
+                    throw new Error(`Worker with ID ${id} not found`);
+                }
+
+                document.getElementById('workerDetails').innerHTML = `
+                    <div class="detail-item">
+                        <div class="detail-label">Name</div>
+                        <div class="detail-value">${worker.name || 'N/A'}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Email</div>
+                        <div class="detail-value">${worker.email || 'N/A'}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Phone</div>
+                        <div class="detail-value">${worker.number || 'N/A'}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Category</div>
+                        <div class="detail-value">${worker.category || 'N/A'}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Experience</div>
+                        <div class="detail-value">${worker.experience || 'N/A'}</div>
+                    </div>
+                `;
+
+                document.getElementById('workerModal').style.display = 'flex';
+            } catch (err) {
+                alert('Failed to load worker details');
+                console.error('❌ View Worker Error:', err);
+            }
+        }
+
+        async function deleteWorker(id) {
+            if (!confirm('Are you sure you want to delete this worker?')) return;
+            try {
+                const res = await fetch(`${BASE_URL}/worker/delete/${id}`, {
+                    method: 'DELETE'
+                });
+                const result = await res.json();
+                alert(result.message || 'Worker deleted successfully');
+                fetchWorkers();
+            } catch (err) {
+                alert('Failed to delete worker');
+                console.error(err);
+            }
+        }
+
+        let editingWorkerId = null;
+
+        async function editWorker(id) {
+            try {
+                const headers = {
+                    'Accept': 'application/json',
+                    'ngrok-skip-browser-warning': 'true'
+                };
+
+                const res = await fetch(`${BASE_URL}/workers`, { headers });
+                const workers = await res.json();
+                const worker = workers.find(w => w.id === id);
+
+                if (!worker) {
+                    alert("Worker not found.");
+                    return;
+                }
+
+                // Fill the form
+                editingWorkerId = id;
+                document.getElementById('editName').value = worker.name || '';
+                document.getElementById('editEmail').value = worker.email || '';
+                document.getElementById('editNumber').value = worker.number || '';
+                document.getElementById('editCategory').value = worker.category || '';
+                document.getElementById('editExperience').value = worker.experience || '';
+
+                // Show modal
+                document.getElementById('editWorkerModal').style.display = 'flex';
+            } catch (error) {
+                alert("Failed to fetch worker details.");
+                console.error("Edit error:", error);
+            }
+        }
+
+        function closeEditModal() {
+            document.getElementById('editWorkerModal').style.display = 'none';
+            editingWorkerId = null;
+        }
+
+        // Form submission
+        document.getElementById('editWorkerForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const updatedWorker = {
+                id: editingWorkerId,
+                worker_uid: 'admin',
+                owner_uid: 'admin',
+                name: document.getElementById('editName').value,
+                email: document.getElementById('editEmail').value,
+                number: document.getElementById('editNumber').value,
+                category: document.getElementById('editCategory').value,
+                experience: document.getElementById('editExperience').value
+            };
+
+            try {
+                const response = await fetch(`${BASE_URL}/worker/update`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'ngrok-skip-browser-warning': 'true'
+                    },
+                    body: JSON.stringify(updatedWorker)
+                });
+
+                const result = await response.json();
+
+                if (!response.ok || result.status !== 'success') {
+                    throw new Error(result.message || 'Update failed');
+                }
+
+                alert(result.message || 'Worker updated successfully!');
+                closeEditModal();
+                fetchWorkers();
+
+            } catch (error) {
+                alert("Failed to update worker: " + error.message);
+                console.error("Update error:", error);
+            }
+        });
+
+        function closeModal() {
+            document.getElementById('workerModal').style.display = 'none';
+        }
+
+        // Load workers on page load
+        document.addEventListener('DOMContentLoaded', fetchWorkers);
+    </script>
+</body>
+
+</html>

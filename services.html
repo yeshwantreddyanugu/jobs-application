@@ -1,0 +1,1407 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Services Management</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Common Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f0f2f5;
+        }
+
+        /* Dashboard Styles */
+        .dashboard {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: #2d3748;
+            color: white;
+            position: fixed;
+            height: 100%;
+            padding: 1rem;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar-header {
+            padding: 1rem;
+            border-bottom: 1px solid #4a5568;
+            margin-bottom: 1rem;
+        }
+
+        .sidebar-header h2 {
+            color: #fff;
+            font-size: 1.5rem;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .menu-item {
+            padding: 0.8rem;
+            margin: 0.5rem 0;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            color: #cbd5e0;
+        }
+
+        .menu-item:hover {
+            background: #4a5568;
+            color: #fff;
+        }
+
+        .menu-item.active {
+            background: #667eea;
+            color: #fff;
+        }
+
+        .menu-item i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .main-content {
+            margin-left: 250px;
+            padding: 2rem;
+            width: calc(100% - 250px);
+        }
+
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .content-header h1 {
+            color: #2d3748;
+            font-size: 1.8rem;
+        }
+
+        .logout-btn {
+            background: transparent;
+            color: transparent;
+            border: none;
+            padding: 1px;
+            margin: 0;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+            border-radius: 0;
+            opacity: 0.01;
+            pointer-events: none;
+            /* Disable interaction visually */
+            position: absolute;
+            /* Optional: push it out of flow */
+        }
+
+        .logout-btn:hover {
+            transform: none;
+            background: transparent;
+        }
+
+        /* Services Table Styles */
+        .services-container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .add-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .add-btn:hover {
+            background: #5a67d8;
+            transform: translateY(-1px);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        th {
+            background-color: #f8fafc;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        tr:hover {
+            background-color: #f8fafc;
+        }
+
+        .action-btn {
+            padding: 0.3rem 0.6rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-right: 0.3rem;
+        }
+
+        .view-btn {
+            background: #4299e1;
+            color: white;
+        }
+
+        .view-btn:hover {
+            background: #3182ce;
+        }
+
+        .update-btn {
+            background: #48bb78;
+            color: white;
+        }
+
+        .update-btn:hover {
+            background: #38a169;
+        }
+
+        .delete-btn {
+            background: #f56565;
+            color: white;
+        }
+
+        .delete-btn:hover {
+            background: #e53e3e;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-content {
+            background: white;
+            margin: 10% auto;
+            padding: 25px;
+            width: 90%;
+            max-width: 600px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .close {
+            float: right;
+            cursor: pointer;
+            font-size: 24px;
+            color: #718096;
+            transition: color 0.2s ease;
+        }
+
+        .close:hover {
+            color: #2d3748;
+        }
+
+        .modal h3 {
+            margin-bottom: 1.5rem;
+            color: #2d3748;
+            font-size: 1.5rem;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 0.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #4a5568;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background-color: #f8fafc;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            background-color: white;
+        }
+
+        .form-group button {
+            width: 100%;
+            padding: 0.8rem;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 0.5rem;
+            font-weight: 500;
+        }
+
+        .form-group button:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+        }
+
+        .image-preview {
+            max-width: 100px;
+            max-height: 100px;
+            margin-top: 10px;
+            display: none;
+            border-radius: 4px;
+            border: 1px solid #e2e8f0;
+        }
+
+        /* Form Section Styles */
+        .form-section {
+            background-color: #f8fafc;
+            border-radius: 8px;
+            padding: 1.2rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid #e2e8f0;
+        }
+
+        .form-section-title {
+            font-size: 1.1rem;
+            color: #2d3748;
+            margin-bottom: 1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-section-title i {
+            color: #667eea;
+        }
+
+        /* Form Row Styles */
+        .form-row {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .form-col {
+            flex: 1;
+        }
+
+        .form-col label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #4a5568;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        /* Checkbox Styles */
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .checkbox-group input {
+            width: auto;
+            transform: scale(1.2);
+        }
+
+        .checkbox-group label {
+            color: #4a5568;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        /* View Modal Styles */
+        .service-details {
+            margin-top: 1rem;
+        }
+
+        .service-details-row {
+            display: flex;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .service-details-label {
+            font-weight: 600;
+            color: #4a5568;
+            width: 150px;
+        }
+
+        .service-details-value {
+            flex: 1;
+            color: #2d3748;
+        }
+
+        .service-image {
+            max-width: 200px;
+            max-height: 200px;
+            margin-top: 10px;
+            border-radius: 4px;
+            border: 1px solid #e2e8f0;
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top: 4px solid #667eea;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        /* Required Field Indicator */
+        .required-field::after {
+            content: " *";
+            color: #f56565;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 200px;
+            }
+
+            .main-content {
+                margin-left: 200px;
+                width: calc(100% - 200px);
+                padding: 1rem;
+            }
+
+            .form-row {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .sidebar {
+                width: 60px;
+                padding: 0.5rem;
+            }
+
+            .sidebar-header h2 {
+                font-size: 1rem;
+                text-align: center;
+            }
+
+            .menu-item span {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 60px;
+                width: calc(100% - 60px);
+            }
+
+            .content-header h1 {
+                font-size: 1.4rem;
+            }
+
+            table {
+                display: block;
+                overflow-x: auto;
+            }
+
+            .service-details-row {
+                flex-direction: column;
+            }
+
+            .service-details-label {
+                width: 100%;
+                margin-bottom: 0.5rem;
+            }
+
+            .modal-content {
+                width: 95%;
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="dashboard">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>Admin Panel</h2>
+            </div>
+            <ul class="sidebar-menu">
+                <li class="menu-item" onclick="window.location.href='dashboard.html'">
+                    <i class="fas fa-home"></i>
+                    <span>Home</span>
+                </li>
+                <li class="menu-item active" onclick="window.location.href='services.html'">
+                    <i class="fas fa-concierge-bell"></i>
+                    <span>Services</span>
+                </li>
+                <li class="menu-item" onclick="window.location.href='workers.html'">
+                    <i class="fas fa-users"></i>
+                    <span>Workers</span>
+                </li>
+                <li class="menu-item" onclick="window.location.href='orders.html'">
+                    <i class="fas fa-clipboard-list"></i>
+                    <span>Orders</span>
+                </li>
+                <li class="menu-item " onclick="window.location.href='promotions.html'">
+                    <i class="fas fa-clipboard-list"></i>
+                    Promotions
+                </li>
+                <li class="menu-item" onclick="window.location.href='banner.html'">
+                    <i class="fas fa-image"></i>
+                    <span>Banner Upload</span>
+                </li>
+                <li class="menu-item" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </li>
+            </ul>
+        </div>
+
+        <div class="main-content">
+            <div class="content-header">
+                <h1>Services Management</h1>
+                <button class="logout-btn" id="logoutBtn2">
+
+
+                </button>
+            </div>
+
+            <div class="services-container">
+                <div class="table-header">
+                    <h2>Main Services</h2>
+                    <button class="add-btn" onclick="showAddServiceModal()">
+                        <i class="fas fa-plus"></i>
+                        Add Service
+                    </button>
+                </div>
+                <div style="max-height: 300px; overflow-y: auto; border: 1px solid #ccc;">
+                    <table id="servicesTable" style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr>
+                                <th>Image</th>
+                                <th>Service</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Services will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="services-container">
+                <div class="filter-bar" style="margin-bottom: 10px;">
+                    <label for="categoryFilter">Filter by Category:</label>
+                    <select id="categoryFilter" onchange="handleCategoryChange()"
+                        style="margin-left: 10px; padding: 5px;">
+                        <option value="">Loading categories...</option>
+                    </select>
+                </div>
+
+                <div class="table-header">
+                    <h2>Child Services</h2>
+                    <button class="add-btn" onclick="showAddChildServiceModal()">
+                        <i class="fas fa-plus"></i>
+                        Add Child Service
+                    </button>
+                </div>
+                <div style="max-height: 300px; overflow-y: auto; border: 1px solid #ccc;">
+                    <table id="childServicesTable" style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr>
+                                <th>Image</th>
+                                <th>Service Name</th>
+                                <th>Category</th>
+                                <th>Price</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Child services will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Service Modal -->
+            <div id="serviceModal" class="modal">
+                <div class="modal-content">
+                    <span class="close">&times;</span>
+                    <h3>Add New Service</h3>
+                    <form id="serviceForm" enctype="multipart/form-data">
+                        <div class="form-group">
+                            <label for="serviceImage">Service Image</label>
+                            <input type="file" id="serviceImage" name="serviceImage" accept="image/*" required>
+                            <img id="serviceImagePreview" class="image-preview" src="#" alt="Image Preview">
+                        </div>
+                        <div class="form-group">
+                            <label for="serviceName">Service Name*</label>
+                            <select id="serviceName" name="serviceName" required>
+                                <option value="" disabled selected>Select a service</option>
+                                <!-- Options will be populated by JavaScript -->
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <button type="submit">Save Service</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Child Service Modal -->
+            <div id="childServiceModal" class="modal">
+                <div class="modal-content">
+                    <span class="close">&times;</span>
+                    <h3 id="childServiceModalTitle">Add Child Service</h3>
+                    <form id="childServiceForm" enctype="multipart/form-data">
+                        <div class="form-group">
+                            <label for="childServiceImage">Service Image*</label>
+                            <input type="file" id="childServiceImage" name="childServiceImage" accept="image/*"
+                                required>
+                            <img id="childImagePreview" class="image-preview" src="#" alt="Image Preview">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="childServiceName">Service Name*</label>
+                            <input type="text" id="childServiceName" name="childServiceName" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="category">Category*</label>
+                            <select id="category" name="category" required>
+                                <option value="">-- Select Category --</option>
+                                <!-- Options will be populated by JavaScript -->
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="form-col">
+                                <label for="price">Price*</label>
+                                <input type="number" id="price" name="price" step="0.01" min="0" required>
+                            </div>
+                            <div class="form-col">
+                                <label for="originalPrice">Original Price</label>
+                                <input type="number" id="originalPrice" name="originalPrice" step="0.01" min="0">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="form-col">
+                                <label for="quantity">Quantity*</label>
+                                <input type="number" id="quantity" name="quantity" min="0" required>
+                            </div>
+                            <div class="form-col">
+                                <label for="serviceId">Service ID*</label>
+                                <input type="number" id="serviceId" name="serviceId" min="0" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="form-col">
+                                <label for="discountPercentage">Discount Percentage</label>
+                                <input type="number" id="discountPercentage" name="discountPercentage" min="0"
+                                    max="100">
+                            </div>
+                            <div class="form-col">
+                                <label for="discountPrice">Discount Price</label>
+                                <input type="number" id="discountPrice" name="discountPrice" step="0.01" min="0">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="form-col">
+                                <label for="rating">Rating</label>
+                                <input type="number" id="rating" name="rating" step="0.1" min="0" max="5">
+                            </div>
+
+                        </div>
+
+                        <div class="form-group">
+                            <button type="submit">Save Child Service</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- View Service Modal -->
+            <div id="viewServiceModal" class="modal">
+                <div class="modal-content">
+                    <span class="close">&times;</span>
+                    <h3 id="viewServiceModalTitle">Service Details</h3>
+                    <div class="service-details" id="serviceDetailsContent">
+                        <!-- Service details will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Service categories constant
+        const SERVICE_CATEGORIES = [
+            "Plumber",
+            "Carpenter",
+            "Electrician",
+            "HVAC Technician (Heating/Ventilation/Air Conditioning)",
+            "Landscaper/Gardener",
+            "Painter (Interior/Exterior)",
+            "Roofer",
+            "Masonry/Concrete Worker",
+            "Handyman (General Repairs)",
+            "Drywall Installer/Repairer",
+            "Flooring Installer (Tile, Hardwood, Carpet)",
+            "Window/Glass Repair Technician",
+            "Deck/Patio Builder",
+            "House Cleaner",
+            "Carpet/Upholstery Cleaner",
+            "Pest Control Specialist",
+            "Pressure Washing Service",
+            "Chimney Sweep",
+            "Moving/Relocation Service",
+            "Storage/Storage Unit Provider",
+            "Junk Removal Service",
+            "Appliance Repair Technician (Refrigerator, Washing Machine, etc.)",
+            "Locksmith",
+            "Solar Panel Installer",
+            "Home Automation Technician",
+            "Computer/IT Repair Technician",
+            "Interior Designer",
+            "Bathroom Remodeler",
+            "Kitchen Remodeler",
+            "General Contractor (Renovations)",
+            "Upholstery/Furniture Repair",
+            "Fire Safety Inspector",
+            "Security System Installer",
+            "Fence/Gate Installer",
+            "Mobile Mechanic",
+            "Car Detailer",
+            "Tire Service Technician",
+            "Home Health Aide",
+            "Personal Trainer (In-Home)",
+            "Massage Therapist (Mobile)",
+            "Event Planner",
+            "Caterer",
+            "Photographer/Videographer",
+            "Welder",
+            "Blacksmith",
+            "Scaffolding Supplier",
+            "Waste Management/Recycling Service"
+        ];
+
+        // Authentication check
+        if (!localStorage.getItem('isLoggedIn')) {
+            window.location.href = 'index.html';
+        }
+
+        // Logout functionality
+        document.getElementById('logoutBtn').addEventListener('click', function () {
+            localStorage.removeItem('isLoggedIn');
+            window.location.href = 'index.html';
+            // Prevent back button navigation
+            history.replaceState(null, null, 'index.html');
+        });
+
+        document.getElementById('logoutBtn2').addEventListener('click', function () {
+            localStorage.removeItem('isLoggedIn');
+            window.location.href = 'index.html';
+            // Prevent back button navigation
+            history.replaceState(null, null, 'index.html');
+        });
+
+        // Replace with your actual API base URL
+        const BASE_URL = 'https://4e9b-2401-4900-1cb4-c2a8-d546-3031-2f29-a78.ngrok-free.app/api/v1';
+        let currentEditingChildId = null;
+        let services = [];
+        let childServices = [];
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchServices();
+            setupModals();
+            populateServiceNameDropdown();
+            populateCategories();
+            populateCategoryFilterDropdown();
+
+            // Setup image previews
+            document.getElementById('serviceImage').addEventListener('change', function (e) {
+                const preview = document.getElementById('serviceImagePreview');
+                if (this.files && this.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        preview.src = e.target.result;
+                        preview.style.display = 'block';
+                    }
+                    reader.readAsDataURL(this.files[0]);
+                }
+            });
+
+            document.getElementById('childServiceImage').addEventListener('change', function (e) {
+                const preview = document.getElementById('childImagePreview');
+                if (this.files && this.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        preview.src = e.target.result;
+                        preview.style.display = 'block';
+                    }
+                    reader.readAsDataURL(this.files[0]);
+                }
+            });
+        });
+
+        // Populate service name dropdown
+        function populateServiceNameDropdown() {
+            const select = document.getElementById('serviceName');
+            select.innerHTML = '<option value="" disabled selected>Select a service</option>';
+
+            SERVICE_CATEGORIES.forEach(category => {
+                const option = document.createElement('option');
+                option.value = category;
+                option.textContent = category;
+                select.appendChild(option);
+            });
+        }
+
+        // Populate categories in dropdowns
+        function populateCategories() {
+            const categorySelect = document.getElementById('category');
+            categorySelect.innerHTML = '<option value="">-- Select Category --</option>';
+
+            SERVICE_CATEGORIES.forEach(category => {
+                const option = document.createElement('option');
+                option.value = category;
+                option.textContent = category;
+                categorySelect.appendChild(option);
+            });
+        }
+
+        // Populate category filter dropdown
+        function populateCategoryFilterDropdown() {
+            const filterSelect = document.getElementById('categoryFilter');
+            filterSelect.innerHTML = '';
+
+            SERVICE_CATEGORIES.forEach((category, index) => {
+                const option = document.createElement('option');
+                option.value = category;
+                option.textContent = category;
+                if (index === 0) option.selected = true;
+                filterSelect.appendChild(option);
+            });
+        }
+
+        // Handle category filter change
+        async function handleCategoryChange() {
+            const selectedCategory = document.getElementById('categoryFilter').value;
+
+            try {
+                showLoading('#childServicesTable tbody');
+
+                const headers = {
+                    'Accept': 'application/json',
+                    'ngrok-skip-browser-warning': 'true'
+                };
+
+                const response = await fetch(`${BASE_URL}/get/child/services/${encodeURIComponent(selectedCategory)}`, {
+                    method: 'GET',
+                    headers: headers
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch child services: ${response.status}`);
+                }
+
+                childServices = await response.json();
+                populateChildServicesTable(childServices);
+
+            } catch (error) {
+                showError('Error filtering services: ' + error.message);
+                console.error(error);
+            }
+        }
+
+        // Fetch services from API
+        async function fetchServices() {
+            try {
+                showLoading('#servicesTable tbody');
+                showLoading('#childServicesTable tbody');
+
+                const headers = {
+                    'Accept': 'application/json',
+                    'ngrok-skip-browser-warning': 'true'
+                };
+
+                // Fetch main services
+                const servicesResponse = await fetch(`${BASE_URL}/Get/services`, {
+                    method: 'GET',
+                    headers: headers
+                });
+
+                if (!servicesResponse.ok) {
+                    throw new Error(`Failed to fetch main services: ${servicesResponse.status}`);
+                }
+                services = await servicesResponse.json();
+                console.log("📦 Loaded ChildServices from response:", services);
+                populateServicesTable(services);
+
+                // Fetch child services for all categories
+                // First get the first category from the filter dropdown to use as default
+                const defaultCategory = document.getElementById('categoryFilter').value || SERVICE_CATEGORIES[0];
+
+                // Fetch child services for the default category
+                const childResponse = await fetch(`${BASE_URL}/get/child/services/${encodeURIComponent(defaultCategory)}`, {
+                    method: 'GET',
+                    headers: headers
+                });
+
+                if (!childResponse.ok) {
+                    throw new Error(`Failed to fetch child services: ${childResponse.status}`);
+                }
+
+                childServices = await childResponse.json();
+                console.log("📦 Loaded services from response:", childServices);
+
+                // Update the category filter dropdown to show the current category
+                document.getElementById('categoryFilter').value = defaultCategory;
+
+                // Apply initial filter (will show services for the default category)
+                handleCategoryChange();
+
+            } catch (error) {
+                showError('Error fetching services: ' + error.message);
+                console.error(error);
+            }
+        }
+        // Populate services table
+        function populateServicesTable(services) {
+            const tbody = document.querySelector('#servicesTable tbody');
+            tbody.innerHTML = '';
+
+            if (!services || services.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3" style="text-align: center;">No services found</td></tr>';
+                return;
+            }
+
+            services.forEach(service => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><img src="${service.image || 'https://via.placeholder.com/50'}" width="50" height="50" alt="${service.name}"></td>
+                    <td>${service.service || 'N/A'}</td>
+                    <td>
+                        <button class="action-btn view-btn" onclick="viewService('${service.id}')">
+                            <i class="fas fa-eye"></i> View
+                        </button>
+                        <button class="action-btn delete-btn" onclick="deleteService('${service.id}')">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Populate child services table
+        function populateChildServicesTable(childServices) {
+            const tbody = document.querySelector('#childServicesTable tbody');
+            tbody.innerHTML = '';
+
+            if (!childServices || childServices.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">No child services found</td></tr>';
+                return;
+            }
+
+            childServices.forEach(service => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><img src="${service.url || 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1MCIgaGVpZ2h0PSI1MCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNjY2MiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNMTkgMjFINGMtMS4xIDAtMi0uOS0yLTJWNWMwLTEuMS45LTIgMi0yaDE0YzEuMSAwIDIgLjkgMiAydjE0YzAgMS4xLS45IDItMiAyWiIvPjxwYXRoIGQ9Ik0xMiA3djEwTTcgMTJoMTAiLz48L3N2Zz4='}" width="50" height="50" alt="${service.serviceName}"></td>
+                    <td>${service.serviceName || 'N/A'}</td>
+                    <td>${service.category || 'N/A'}</td>
+                    <td>$${service.price?.toFixed(2) || '0.00'}</td>
+                    <td>
+                        <button class="action-btn view-btn" onclick="viewChildService('${service.id}')">
+                            <i class="fas fa-eye"></i> View
+                        </button>
+                        <button class="action-btn update-btn" onclick="editChildService('${service.id}')">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <button class="action-btn delete-btn" onclick="deleteChildService('${service.id}')">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // View service details
+        function viewService(id) {
+            try {
+                showLoading('#serviceDetailsContent');
+                document.getElementById('viewServiceModal').style.display = 'block';
+
+                const service = services.find(s => s.id === id);
+                if (!service) throw new Error('Service not found');
+
+                document.getElementById('viewServiceModalTitle').textContent = service.service || 'Service Details';
+
+                const detailsContent = `
+                    <div class="service-details-row">
+                        <div class="service-details-label">Image:</div>
+                        <div class="service-details-value">
+                            <img src="${service.image || 'https://via.placeholder.com/200'}" class="service-image">
+                        </div>
+                    </div>
+                    <div class="service-details-row">
+                        <div class="service-details-label">Name:</div>
+                        <div class="service-details-value">${service.service || 'N/A'}</div>
+                    </div>
+                `;
+
+                document.getElementById('serviceDetailsContent').innerHTML = detailsContent;
+            } catch (error) {
+                showError('Error loading service details: ' + error.message);
+                console.error(error);
+            }
+        }
+
+        // View child service details
+        function viewChildService(id) {
+            try {
+                showLoading('#serviceDetailsContent');
+                document.getElementById('viewServiceModal').style.display = 'block';
+
+                const service = childServices.find(s => s.id === id);
+                if (!service) throw new Error('Service not found');
+
+                document.getElementById('viewServiceModalTitle').textContent = service.serviceName || 'Service Details';
+
+                const detailsContent = `
+                    <div class="service-details-row">
+                        <div class="service-details-label">Image:</div>
+                        <div class="service-details-value">
+                            <img src="${service.url || 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2NjYyIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0xOSAyMUEyIDIgMCAwIDAgMjEgMTlWNUExIDIgMCAwIDAgMTkgM0g1QTIgMiAwIDAgMCAzIDV2MTRhMiAyIDAgMCAwIDIgMloiLz48cGF0aCBkPSJNMTAgMTBoNCIvPjwvc3ZnPg=='}" class="service-image">
+                        </div>
+                    </div>
+                    <div class="service-details-row">
+                        <div class="service-details-label">Name:</div>
+                        <div class="service-details-value">${service.serviceName || 'N/A'}</div>
+                    </div>
+                    <div class="service-details-row">
+                        <div class="service-details-label">Category:</div>
+                        <div class="service-details-value">${service.category || 'N/A'}</div>
+                    </div>
+                    <div class="service-details-row">
+                        <div class="service-details-label">Price:</div>
+                        <div class="service-details-value">$${service.price?.toFixed(2) || '0.00'}</div>
+                    </div>
+                    <div class="service-details-row">
+                        <div class="service-details-label">Original Price:</div>
+                        <div class="service-details-value">${service.originalPrice ? '$' + service.originalPrice.toFixed(2) : 'N/A'}</div>
+                    </div>
+                    <div class="service-details-row">
+                        <div class="service-details-label">Quantity:</div>
+                        <div class="service-details-value">${service.quantity || '0'}</div>
+                    </div>
+                    <div class="service-details-row">
+                        <div class="service-details-label">Discount:</div>
+                        <div class="service-details-value">${service.discountPercentage ? service.discountPercentage + '%' : 'N/A'} 
+                        ${service.discountPrice ? '($' + service.discountPrice.toFixed(2) + ')' : ''}</div>
+                    </div>
+                    <div class="service-details-row">
+                        <div class="service-details-label">Rating:</div>
+                        <div class="service-details-value">${service.rating || 'N/A'}</div>
+                    </div>
+                    <div class="service-details-row">
+                        <div class="service-details-label">Service ID:</div>
+                        <div class="service-details-value">${service.serviceId || 'N/A'}</div>
+                    </div>
+                    <div class="service-details-row">
+                        <div class="service-details-label">URL:</div>
+                        <div class="service-details-value">${service.url ? `<a href="${service.url}" target="_blank">${service.url}</a>` : 'N/A'}</div>
+                    </div>
+                `;
+
+                document.getElementById('serviceDetailsContent').innerHTML = detailsContent;
+            } catch (error) {
+                console.error('View error:', error);
+                document.getElementById('serviceDetailsContent').innerHTML = `
+                    <div style="color: red; padding: 20px;">
+                        <h4>Error Loading Service</h4>
+                        <p>${error.message}</p>
+                        <p>Please try refreshing the page.</p>
+                        <button onclick="fetchServices()" style="padding: 8px 16px; background: #667eea; color: white; border: none; border-radius: 4px;">
+                            Refresh Data
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        // Generate UUID
+        function generateUUID() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+                const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+
+        // Handle service form submission
+        async function handleServiceSubmit(event) {
+            event.preventDefault();
+
+            const formData = new FormData();
+            const imageFile = document.getElementById('serviceImage').files[0];
+            const serviceName = document.getElementById('serviceName').value;
+
+            if (!imageFile || !serviceName) {
+                showError('Please fill all required fields');
+                return;
+            }
+
+            const id = generateUUID();
+            const uid = 'user123'; // This should be replaced with actual user ID from your auth system
+
+            const serviceClassObj = {
+                id: id,
+                uid: uid,
+                image: "",
+                service: serviceName
+            };
+
+            formData.append('photo', imageFile);
+            formData.append('ServiceClass', JSON.stringify(serviceClassObj));
+
+            try {
+                const response = await fetch(`${BASE_URL}/save/service`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.message || 'Upload failed');
+                }
+
+                alert('Service saved successfully!');
+                closeModal('serviceModal');
+                fetchServices(); // Refresh the services list
+            } catch (error) {
+                console.error('Error:', error);
+                showError('Error saving service: ' + error.message);
+            }
+        }
+
+        // Handle child service form submission
+        async function handleChildServiceSubmit(event) {
+            event.preventDefault();
+
+            const isUpdating = !!currentEditingChildId;
+            const id = isUpdating ? currentEditingChildId : generateUUID();
+
+            console.log('🔧 Submit mode:', isUpdating ? 'EDIT' : 'CREATE');
+            console.log('🆔 Final ID being used:', id);
+
+            const formData = new FormData();
+            const imageFile = document.getElementById('childServiceImage').files[0];
+
+            const service = childServices.find(s => String(s.id) === String(id)); // get existing data
+            const serviceData = {
+                id,
+                serviceName: document.getElementById('childServiceName').value.trim(),
+                category: document.getElementById('category').value,
+                price: parseFloat(document.getElementById('price').value),
+                quantity: parseInt(document.getElementById('quantity').value),
+                discountPercentage: parseInt(document.getElementById('discountPercentage').value) || 0,
+                discountPrice: parseFloat(document.getElementById('discountPrice').value) || 0,
+                rating: parseFloat(document.getElementById('rating').value) || 0,
+                serviceId: parseInt(document.getElementById('serviceId').value),
+                url: imageFile ? "" : (service?.url || ""),  // ✅ retain existing URL
+                originalPrice: parseFloat(document.getElementById('originalPrice').value) || 0
+            };
+
+
+            if (!imageFile && !isUpdating) {
+                showError("Please select an image for new service.");
+                return;
+            }
+
+            if (imageFile) {
+                formData.append('photo', imageFile);
+            }
+
+            formData.append('ServiceItem', JSON.stringify(serviceData));
+
+            try {
+                const endpoint = isUpdating
+                    ? `${BASE_URL}/update/child/service/${id}`
+                    : `${BASE_URL}/save/child/service`;
+                const method = isUpdating ? 'PUT' : 'POST';
+
+                const response = await fetch(endpoint, {
+                    method: method,
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (!response.ok || result.status !== 'success') {
+                    throw new Error(result.message || 'Something went wrong with server');
+                }
+
+                alert(isUpdating ? 'Child service updated successfully!' : 'Child service created successfully!');
+                closeModal('childServiceModal');
+                document.getElementById('childServiceForm').reset();
+                document.getElementById('childImagePreview').style.display = 'none';
+                currentEditingChildId = null; // ✅ clear only after successful submission
+                fetchServices();
+            } catch (error) {
+                console.error("Submission error:", error);
+                showError('Error saving child service: ' + error.message);
+            }
+        }
+
+
+
+        // Delete service
+        async function deleteService(id) {
+            if (confirm('Are you sure you want to delete this service? This will also delete all child services under it.')) {
+                try {
+                    const response = await fetch(`${BASE_URL}/service/delete/${id}`, {
+                        method: 'DELETE'
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.message || 'Failed to delete service');
+                    }
+
+                    alert('Service deleted successfully!');
+                    fetchServices();
+                } catch (error) {
+                    showError('Error deleting service: ' + error.message);
+                    console.error(error);
+                }
+            }
+        }
+
+        // Delete child service
+        async function deleteChildService(id) {
+            if (confirm('Are you sure you want to delete this child service?')) {
+                try {
+                    const response = await fetch(`${BASE_URL}/delete/child/service/${id}`, {
+                        method: 'DELETE'
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.message || 'Failed to delete child service');
+                    }
+
+                    alert('Child service deleted successfully!');
+                    fetchServices();
+                } catch (error) {
+                    showError('Error deleting child service: ' + error.message);
+                    console.error(error);
+                }
+            }
+        }
+
+        // Edit child service
+        async function editChildService(id) {
+
+
+            try {
+                const modal = document.getElementById('childServiceModal');
+                modal.style.display = 'block';
+
+
+
+                // 🧪 Debug: check if input fields exist
+                [
+                    'childServiceName',
+                    'category',
+                    'price',
+                    'originalPrice',
+                    'quantity',
+                    'discountPercentage',
+                    'discountPrice',
+                    'rating',
+                    'serviceId',
+
+                ].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (!el) {
+                        console.warn(`❌ Missing input field: ${id}`);
+                    } else {
+                        console.log(`✅ Found input field: ${id}`);
+                    }
+                });
+
+
+
+
+                // Wait a short delay to ensure modal is open
+                await new Promise(resolve => setTimeout(resolve, 100));
+
+                const service = childServices.find(s => String(s.id) === String(id));
+                if (!service) throw new Error(`Service with ID ${id} not found`);
+
+                document.getElementById('childServiceName').value = service.serviceName || '';
+                document.getElementById('category').value = service.category || '';
+                document.getElementById('price').value = service.price || '';
+                document.getElementById('originalPrice').value = service.originalPrice || '';
+                document.getElementById('quantity').value = service.quantity || '';
+                document.getElementById('discountPercentage').value = service.discountPercentage || '';
+                document.getElementById('discountPrice').value = service.discountPrice || '';
+                document.getElementById('rating').value = service.rating || '';
+                document.getElementById('serviceId').value = service.serviceId || '';
+                //document.getElementById('url').value = service.url || '';
+
+                const preview = document.getElementById('childImagePreview');
+                if (preview) {
+                    preview.src = service.url || '';
+                    preview.style.display = service.url ? 'block' : 'none';
+                }
+
+                console.log('📍 Editing child service ID:', id);
+
+                document.getElementById('childServiceModalTitle').textContent = 'Edit Child Service';
+                currentEditingChildId = id;
+                console.log(document.getElementById('childServiceName')); // ✅ Check this specifically
+
+
+            } catch (error) {
+                console.error('Edit error:', error);
+                showError('Failed to edit service: ' + error.message);
+            }
+        }
+
+        // Modal functions
+        function setupModals() {
+            document.querySelectorAll('.close').forEach(closeBtn => {
+                closeBtn.onclick = () => closeModal(closeBtn.closest('.modal').id);
+            });
+
+            window.onclick = (event) => {
+                if (event.target.classList.contains('modal')) {
+                    closeModal(event.target.id);
+                }
+            };
+
+            document.getElementById('serviceForm').onsubmit = handleServiceSubmit;
+            document.getElementById('childServiceForm').onsubmit = handleChildServiceSubmit;
+        }
+
+        function showAddServiceModal() {
+            document.getElementById('serviceForm').reset();
+            document.getElementById('serviceImagePreview').style.display = 'none';
+            document.getElementById('serviceModal').style.display = 'block';
+        }
+
+        function showAddChildServiceModal() {
+            document.getElementById('childServiceModalTitle').textContent = 'Add Child Service';
+            document.getElementById('childServiceForm').reset();
+            document.getElementById('childImagePreview').style.display = 'none';
+            currentEditingChildId = null;
+            document.getElementById('childServiceModal').style.display = 'block';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        // Utility functions
+        function showError(message) {
+            alert('Error: ' + message);
+        }
+
+        function showLoading(selector) {
+            const element = document.querySelector(selector);
+            if (element) {
+                element.innerHTML = '<tr><td colspan="10"><div class="spinner"></div></td></tr>';
+            }
+        }
+    </script>
+</body>
+
+</html>

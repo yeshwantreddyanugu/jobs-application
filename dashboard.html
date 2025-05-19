@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Common Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f0f2f5;
+        }
+
+        /* Dashboard Styles */
+        .dashboard {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: #2d3748;
+            color: white;
+            position: fixed;
+            height: 100%;
+            padding: 1rem;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar-header {
+            padding: 1rem;
+            border-bottom: 1px solid #4a5568;
+            margin-bottom: 1rem;
+        }
+
+        .sidebar-header h2 {
+            color: #fff;
+            font-size: 1.5rem;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .menu-item {
+            padding: 0.8rem;
+            margin: 0.5rem 0;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            color: #cbd5e0;
+        }
+
+        .menu-item:hover {
+            background: #4a5568;
+            color: #fff;
+        }
+
+        .menu-item.active {
+            background: #667eea;
+            color: #fff;
+        }
+
+        .menu-item i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .main-content {
+            margin-left: 250px;
+            padding: 2rem;
+            width: calc(100% - 250px);
+        }
+
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .content-header h1 {
+            color: #2d3748;
+            font-size: 1.8rem;
+        }
+
+        .logout-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logout-btn:hover {
+            background: #5a67d8;
+            transform: translateY(-1px);
+        }
+
+        /* Analytics Dashboard Styles */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card .stat-title {
+            color: #4a5568;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card .stat-value {
+            color: #2d3748;
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card .stat-change {
+            display: flex;
+            align-items: center;
+            font-size: 0.85rem;
+        }
+
+        .stat-card .stat-change.positive {
+            color: #38a169;
+        }
+
+        .stat-card .stat-change.negative {
+            color: #e53e3e;
+        }
+
+        .stat-card i {
+            margin-right: 0.3rem;
+        }
+
+        .charts-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (min-width: 1200px) {
+            .charts-container {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .chart-card {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .chart-card h3 {
+            color: #2d3748;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 200px;
+            }
+
+            .main-content {
+                margin-left: 200px;
+                width: calc(100% - 200px);
+                padding: 1rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .sidebar {
+                width: 60px;
+                padding: 0.5rem;
+            }
+
+            .sidebar-header h2 {
+                font-size: 1rem;
+                text-align: center;
+            }
+
+            .menu-item span {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 60px;
+                width: calc(100% - 60px);
+            }
+
+            .content-header h1 {
+                font-size: 1.4rem;
+            }
+
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="dashboard">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>Admin Panel</h2>
+            </div>
+            <ul class="sidebar-menu">
+                <li class="menu-item active">
+                    <i class="fas fa-home"></i>
+                    <span>Analytics</span>
+                </li>
+                <li class="menu-item" onclick="window.location.href='services.html'">
+                    <i class="fas fa-concierge-bell"></i>
+                    <span>Services</span>
+                </li>
+                <li class="menu-item" onclick="window.location.href='workers.html'">
+                    <i class="fas fa-users"></i>
+                    <span>Workers</span>
+                </li>
+                <li class="menu-item" onclick="window.location.href='orders.html'">
+                    <i class="fas fa-clipboard-list"></i>
+                    <span>Orders</span>
+                </li>
+                <li class="menu-item" onclick="window.location.href='promotions.html'">
+                    <i class="fas fa-percentage"></i>
+                    <span>Promotions</span>
+                </li>
+                <li class="menu-item" onclick="window.location.href='banner.html'">
+                    <i class="fas fa-image"></i>
+                    <span>Banner Upload</span>
+                </li>
+                <li class="menu-item" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </li>
+            </ul>
+        </div>
+
+        <div class="main-content">
+            <div class="content-header">
+                <h1>Analytics Dashboard</h1>
+                <div class="time-period-selector">
+                    <select id="timePeriod" class="logout-btn">
+                        <option value="7">Last 7 Days</option>
+                        <option value="30" selected>Last 30 Days</option>
+                        <option value="90">Last 90 Days</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="stats-container" id="statsContainer">
+                <!-- Stats cards will be loaded here -->
+                <div class="stat-card">
+                    <div class="stat-title">Total Orders</div>
+                    <div class="stat-value">0</div>
+                    <div class="stat-change">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <span>Loading...</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-title">Total Revenue</div>
+                    <div class="stat-value">$0</div>
+                    <div class="stat-change">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <span>Loading...</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-title">Active Users</div>
+                    <div class="stat-value">0</div>
+                    <div class="stat-change">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <span>Loading...</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-title">New Customers</div>
+                    <div class="stat-value">0</div>
+                    <div class="stat-change">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <span>Loading...</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-title">Completed Services</div>
+                    <div class="stat-value">0</div>
+                    <div class="stat-change">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <span>Loading...</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-title">Avg. Rating</div>
+                    <div class="stat-value">0.0</div>
+                    <div class="stat-change">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <span>Loading...</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="charts-container">
+                <div class="chart-card">
+                    <h3>Orders Trend</h3>
+                    <div class="chart-container">
+                        <canvas id="ordersChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <h3>Revenue by Service</h3>
+                    <div class="chart-container">
+                        <canvas id="revenueChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Base URL for API endpoints
+        const BASE_URL = 'https://your-api-domain.com/api'; // Replace with your actual API base URL
+
+        // Authentication check
+        if (!localStorage.getItem('isLoggedIn')) {
+            window.location.href = 'index.html';
+        }
+
+        // Logout functionality
+        document.getElementById('logoutBtn').addEventListener('click', function () {
+            localStorage.removeItem('isLoggedIn');
+            window.location.href = 'index.html';
+            // Prevent back button navigation
+            history.replaceState(null, null, 'index.html');
+        });
+
+        // Chart instances
+        let ordersChart;
+        let revenueChart;
+
+        // DOM Elements
+        const timePeriodSelect = document.getElementById('timePeriod');
+
+        // Initialize the dashboard
+        document.addEventListener('DOMContentLoaded', function () {
+            fetchAnalyticsData();
+            timePeriodSelect.addEventListener('change', fetchAnalyticsData);
+        });
+
+        // Fetch analytics data from backend
+        // Replace the existing fetchAnalyticsData function with this version
+        async function fetchAnalyticsData() {
+            const days = timePeriodSelect.value;
+
+            try {
+                // Show loading states
+                document.querySelectorAll('.stat-value').forEach(el => el.textContent = '0');
+                document.querySelectorAll('.stat-change').forEach(el => {
+                    el.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Loading...</span>';
+                });
+
+                // --- START OF MOCK DATA IMPLEMENTATION ---
+                // Comment out the real API calls and use this mock data instead
+                // For testing purposes only - remove this when connecting to real API
+
+                // Simulate API delay
+                await new Promise(resolve => setTimeout(resolve, 800));
+
+                // This is your mock data
+                const mockData = {
+                    "totalOrders": 1245,
+                    "ordersChange": 12.5,
+                    "totalRevenue": 28450.75,
+                    "revenueChange": 8.3,
+                    "activeUsers": 845,
+                    "usersChange": 5.2,
+                    "newCustomers": 132,
+                    "customersChange": -2.4,
+                    "completedServices": 987,
+                    "servicesChange": 15.7,
+                    "avgRating": 4.7,
+                    "ratingChange": 0.5,
+                    "ordersTrend": {
+                        "labels": ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+                        "values": [120, 190, 170, 220, 210, 240]
+                    },
+                    "revenueByService": {
+                        "labels": ["Cleaning", "Repair", "Maintenance", "Installation", "Consultation"],
+                        "values": [12000, 8500, 4500, 2200, 1250]
+                    }
+                };
+
+                // Use the mock data directly
+                updateStatsCards(mockData);
+                updateCharts(mockData);
+
+                // --- END OF MOCK DATA IMPLEMENTATION ---
+
+                /* 
+                // REAL API CODE (commented out for now)
+                // Fetch stats data
+                const statsResponse = await fetch(`${BASE_URL}/analytics/stats?days=${days}`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+                const statsData = await statsResponse.json();
+        
+                if (!statsResponse.ok) {
+                    throw new Error(statsData.message || 'Failed to fetch stats');
+                }
+        
+                // Update stats cards
+                updateStatsCards(statsData);
+        
+                // Fetch chart data
+                const chartsResponse = await fetch(`${BASE_URL}/analytics/charts?days=${days}`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+                const chartsData = await chartsResponse.json();
+        
+                if (!chartsResponse.ok) {
+                    throw new Error(chartsData.message || 'Failed to fetch charts data');
+                }
+        
+                // Update charts
+                updateCharts(chartsData);
+                */
+            } catch (error) {
+                console.error('Analytics error:', error);
+                alert('Error loading analytics: ' + error.message);
+            }
+        }
+
+
+
+
+        // Update stats cards with data
+        function updateStatsCards(data) {
+            if (!data) return;
+
+            // Total Orders
+            if (data.totalOrders !== undefined) {
+                document.querySelectorAll('.stat-card')[0].querySelector('.stat-value').textContent = data.totalOrders;
+                updateChangeIndicator(document.querySelectorAll('.stat-card')[0], data.ordersChange);
+            }
+
+            // Total Revenue
+            if (data.totalRevenue !== undefined) {
+                document.querySelectorAll('.stat-card')[1].querySelector('.stat-value').textContent =
+                    '$' + (data.totalRevenue ? data.totalRevenue.toLocaleString() : '0');
+                updateChangeIndicator(document.querySelectorAll('.stat-card')[1], data.revenueChange);
+            }
+
+            // Active Users
+            if (data.activeUsers !== undefined) {
+                document.querySelectorAll('.stat-card')[2].querySelector('.stat-value').textContent = data.activeUsers;
+                updateChangeIndicator(document.querySelectorAll('.stat-card')[2], data.usersChange);
+            }
+
+            // New Customers
+            if (data.newCustomers !== undefined) {
+                document.querySelectorAll('.stat-card')[3].querySelector('.stat-value').textContent = data.newCustomers;
+                updateChangeIndicator(document.querySelectorAll('.stat-card')[3], data.customersChange);
+            }
+
+            // Completed Services
+            if (data.completedServices !== undefined) {
+                document.querySelectorAll('.stat-card')[4].querySelector('.stat-value').textContent = data.completedServices;
+                updateChangeIndicator(document.querySelectorAll('.stat-card')[4], data.servicesChange);
+            }
+
+            // Avg. Rating
+            if (data.avgRating !== undefined) {
+                document.querySelectorAll('.stat-card')[5].querySelector('.stat-value').textContent =
+                    data.avgRating ? data.avgRating.toFixed(1) : '0.0';
+                updateChangeIndicator(document.querySelectorAll('.stat-card')[5], data.ratingChange);
+            }
+        }
+
+        // Update change indicator with trend arrow
+        function updateChangeIndicator(cardElement, change) {
+            if (!cardElement || change === undefined) return;
+
+            const changeElement = cardElement.querySelector('.stat-change');
+
+            if (change > 0) {
+                changeElement.innerHTML = '<i class="fas fa-arrow-up"></i><span>' + Math.abs(change) + '% increase</span>';
+                changeElement.className = 'stat-change positive';
+            } else if (change < 0) {
+                changeElement.innerHTML = '<i class="fas fa-arrow-down"></i><span>' + Math.abs(change) + '% decrease</span>';
+                changeElement.className = 'stat-change negative';
+            } else {
+                changeElement.innerHTML = '<i class="fas fa-minus"></i><span>No change</span>';
+                changeElement.className = 'stat-change';
+            }
+        }
+
+        // Update charts with data
+        function updateCharts(data) {
+            if (!data) return;
+
+            // Destroy existing charts if they exist
+            if (ordersChart) {
+                ordersChart.destroy();
+            }
+            if (revenueChart) {
+                revenueChart.destroy();
+            }
+
+            // Orders Trend Chart (Line Chart)
+            const ordersCtx = document.getElementById('ordersChart').getContext('2d');
+            ordersChart = new Chart(ordersCtx, {
+                type: 'line',
+                data: {
+                    labels: data.ordersTrend?.labels || [],
+                    datasets: [{
+                        label: 'Orders',
+                        data: data.ordersTrend?.values || [],
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: getChartOptions('Orders')
+            });
+
+            // Revenue by Service Chart (Bar Chart)
+            const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+            revenueChart = new Chart(revenueCtx, {
+                type: 'bar',
+                data: {
+                    labels: data.revenueByService?.labels || [],
+                    datasets: [{
+                        label: 'Revenue',
+                        data: data.revenueByService?.values || [],
+                        backgroundColor: [
+                            'rgba(102, 126, 234, 0.7)',
+                            'rgba(237, 137, 54, 0.7)',
+                            'rgba(56, 161, 105, 0.7)',
+                            'rgba(214, 158, 46, 0.7)',
+                            'rgba(190, 75, 219, 0.7)'
+                        ],
+                        borderColor: [
+                            'rgba(102, 126, 234, 1)',
+                            'rgba(237, 137, 54, 1)',
+                            'rgba(56, 161, 105, 1)',
+                            'rgba(214, 158, 46, 1)',
+                            'rgba(190, 75, 219, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: getChartOptions('Revenue', true)
+            });
+        }
+
+        // Common chart options
+        function getChartOptions(title, isCurrency = false) {
+            return {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    title: {
+                        display: true,
+                        text: title,
+                        padding: {
+                            top: 10,
+                            bottom: 20
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        },
+                        ticks: {
+                            callback: isCurrency ? function (value) {
+                                return '$' + value;
+                            } : undefined
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            };
+        }
+
+
+
+
+    </script>
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- 
+ async function fetchAnalyticsData() {
+        const days = timePeriodSelect.value;
+        
+        try {
+            // Show loading states
+            document.querySelectorAll('.stat-value').forEach(function(el) {
+                el.textContent = '0';
+            });
+            document.querySelectorAll('.stat-change').forEach(function(el) {
+                el.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Loading...</span>';
+            });
+
+            // Fetch stats data
+            const statsResponse = await fetch(`${BASE_URL}/analytics/stats?days=${days}`, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+            const statsData = await statsResponse.json();
+
+            if (!statsResponse.ok) {
+                throw new Error(statsData.message || 'Failed to fetch stats');
+            }
+
+            // Update stats cards
+            updateStatsCards(statsData);
+
+            // Fetch chart data
+            const chartsResponse = await fetch(`${BASE_URL}/analytics/charts?days=${days}`, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+            const chartsData = await chartsResponse.json();
+
+            if (!chartsResponse.ok) {
+                throw new Error(chartsData.message || 'Failed to fetch charts data');
+            }
+
+            // Update charts
+            updateCharts(chartsData);
+        } catch (error) {
+            console.error('Analytics error:', error);
+            alert('Error loading analytics: ' + error.message);
+        }
+    } -->

@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Common Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f0f2f5;
+        }
+
+        /* Login Page Styles */
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .login-form {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            width: 350px;
+            transform: translateY(-20px);
+            animation: slideUp 0.5s ease forwards;
+        }
+
+        @keyframes slideUp {
+            to {
+                transform: translateY(0);
+            }
+        }
+
+        .login-form h1 {
+            text-align: center;
+            color: #2d3748;
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #4a5568;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 0.8rem;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .login-btn:hover {
+            background: #5a67d8;
+            transform: translateY(-1px);
+        }
+
+        /* Dashboard Styles */
+        .dashboard {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: #2d3748;
+            color: white;
+            position: fixed;
+            height: 100%;
+            padding: 1rem;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar-header {
+            padding: 1rem;
+            border-bottom: 1px solid #4a5568;
+            margin-bottom: 1rem;
+        }
+
+        .sidebar-header h2 {
+            color: #fff;
+            font-size: 1.5rem;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .menu-item {
+            padding: 0.8rem;
+            margin: 0.5rem 0;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            color: #cbd5e0;
+        }
+
+        .menu-item:hover {
+            background: #4a5568;
+            color: #fff;
+        }
+
+        .menu-item.active {
+            background: #667eea;
+            color: #fff;
+        }
+
+        .menu-item i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .main-content {
+            margin-left: 250px;
+            padding: 2rem;
+            width: calc(100% - 250px);
+        }
+
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .content-header h1 {
+            color: #2d3748;
+            font-size: 1.8rem;
+        }
+
+        .logout-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logout-btn:hover {
+            background: #5a67d8;
+            transform: translateY(-1px);
+        }
+
+        /* Orders Page Specific Styles */
+        .order-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .order-btn {
+            padding: 0.8rem 1.5rem;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .order-btn:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+        }
+
+        .order-btn.active {
+            background: #4a5568;
+        }
+
+        .table-container {
+            max-height: 500px;
+            overflow-y: auto;
+            border: 1px solid #e2e8f0;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        th {
+            background-color: #f8fafc;
+            position: sticky;
+            top: 0;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        tr:hover {
+            background-color: #f8fafc;
+        }
+
+        .action-btn {
+            padding: 0.5rem 1rem;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            background: #5a67d8;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .modal-header h2 {
+            color: #2d3748;
+            font-size: 1.5rem;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #718096;
+        }
+
+        .modal-body {
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+
+        .modal-btn {
+            padding: 0.7rem 1.5rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .close-modal-btn {
+            background: #e53e3e;
+            color: white;
+        }
+
+        .close-modal-btn:hover {
+            background: #c53030;
+        }
+
+        .assign-btn {
+            background: #38a169;
+            color: white;
+        }
+
+        .assign-btn:hover {
+            background: #2f855a;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 200px;
+            }
+
+            .main-content {
+                margin-left: 200px;
+                width: calc(100% - 200px);
+                padding: 1rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .sidebar {
+                width: 60px;
+                padding: 0.5rem;
+            }
+
+            .sidebar-header h2 {
+                font-size: 1rem;
+                text-align: center;
+            }
+
+            .menu-item span {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 60px;
+                width: calc(100% - 60px);
+            }
+
+            .content-header h1 {
+                font-size: 1.4rem;
+            }
+
+            .order-buttons {
+                flex-direction: column;
+            }
+
+            .modal-content {
+                width: 95%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="dashboard">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>Admin Panel</h2>
+            </div>
+            <ul class="sidebar-menu">
+                <li class="menu-item " onclick="window.location.href='dashboard.html'">
+                    <i class="fas fa-home"></i>
+                    Home
+                </li>
+                <li class="menu-item" onclick="window.location.href='services.html'">
+                    <i class="fas fa-concierge-bell"></i>
+                    Services
+                </li>
+                <li class="menu-item" onclick="window.location.href='workers.html'">
+                    <i class="fas fa-users"></i>
+                    Workers
+                </li>
+                <li class="menu-item active" onclick="window.location.href='orders.html'">
+                    <i class="fas fa-clipboard-list"></i>
+                    Orders
+                </li>
+                <li class="menu-item " onclick="window.location.href='promotions.html'">
+                    <i class="fas fa-clipboard-list"></i>
+                    Promotions
+                </li>
+                <li class="menu-item" onclick="window.location.href='banner.html'">
+                    <i class="fas fa-image"></i>
+                    <span>Banner Upload</span>
+                </li>
+                <li class="menu-item" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Logout
+                </li>
+            </ul>
+        </div>
+
+        <div class="main-content">
+            <div class="content-header">
+                <h1>Orders Management</h1>
+            </div>
+
+            <div class="order-buttons">
+                <button class="order-btn active" id="pendingBtn">Pending</button>
+                <button class="order-btn" id="assignedBtn">Assigned</button>
+                <button class="order-btn" id="acceptedBtn">Accepted</button>
+                <button class="order-btn" id="successBtn">Success</button>
+            </div>
+
+            <div class="table-container" id="ordersTableContainer">
+                <!-- Orders table will be loaded here -->
+            </div>
+
+            <div class="table-container" id="workersTableContainer" style="display: none;">
+                <!-- Workers table will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Worker Details Modal -->
+    <div class="modal" id="workerModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Worker Details</h2>
+                <button class="close-btn" id="closeModal">&times;</button>
+            </div>
+            <div class="modal-body" id="workerDetails">
+                <!-- Worker details will be loaded here -->
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn close-modal-btn" id="cancelAssign">Close</button>
+                <button class="modal-btn assign-btn" id="assignWorker">Assign</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Base URL
+        const BASE_URL = 'https://5134-2401-4900-1c27-9d34-258e-e24-111f-6129.ngrok-free.app';
+
+        // Global variables to store current order and worker data
+        let currentOrderId = null;
+        let currentWorkerId = null;
+        let currentWorkerUid = null;
+        let currentCategory = null;
+        let workersData = {};
+
+        // Authentication check
+        if (!localStorage.getItem('isLoggedIn')) {
+            window.location.href = 'index.html';
+        }
+
+        // Logout functionality
+        document.getElementById('logoutBtn').addEventListener('click', function () {
+            localStorage.removeItem('isLoggedIn');
+            window.location.href = 'index.html';
+            // Prevent back button navigation
+            history.replaceState(null, null, 'index.html');
+        });
+
+        // Order buttons functionality
+        // Update the button event listeners to use the correct endpoints:
+        document.getElementById('pendingBtn').addEventListener('click', function () {
+            setActiveButton('pendingBtn');
+            fetchOrders('/api/v1/pending');
+        });
+
+        document.getElementById('assignedBtn').addEventListener('click', function () {
+            setActiveButton('assignedBtn');
+            fetchOrders('/api/v1/assigned');
+        });
+
+        document.getElementById('acceptedBtn').addEventListener('click', function () {
+            setActiveButton('acceptedBtn');
+            fetchOrders('/api/v1/get/worker/accepted/orders');
+        });
+
+        document.getElementById('successBtn').addEventListener('click', function () {
+            setActiveButton('successBtn');
+            fetchOrders('/api/v1/success');
+        });
+
+
+        // Modal functionality
+        document.getElementById('closeModal').addEventListener('click', function () {
+            document.getElementById('workerModal').style.display = 'none';
+        });
+
+        document.getElementById('cancelAssign').addEventListener('click', function () {
+            document.getElementById('workerModal').style.display = 'none';
+        });
+
+        document.getElementById('assignWorker').addEventListener('click', function () {
+            assignWorkerToOrder();
+        });
+
+        // Set active button
+        function setActiveButton(buttonId) {
+            document.querySelectorAll('.order-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById(buttonId).classList.add('active');
+        }
+
+        // Fetch orders from API
+        function fetchOrders(endpoint) {
+            document.getElementById('workersTableContainer').style.display = 'none';
+            document.getElementById('ordersTableContainer').style.display = 'block';
+
+            fetch(BASE_URL + endpoint, {
+                headers: {
+                    'Authorization': 'Bearer ' + localStorage.getItem('token'),
+                    'Accept': 'application/json',
+                    'ngrok-skip-browser-warning': 'true'
+                }
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log(`Data from ${endpoint}:`, data);
+
+                    if (endpoint === '/api/v1/pending') {
+                        renderPendingOrdersTable(data);
+                    } else if (endpoint === '/api/v1/assigned') {
+                        renderAssignedOrdersTable(data);
+                    } else if (endpoint === '/api/v1/get/worker/accepted/orders') {
+                        renderAcceptedOrdersTable(data);
+                    } else if (endpoint === '/api/v1/success') {
+                        renderSuccessOrdersTable(data);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching orders:', error);
+                    document.getElementById('ordersTableContainer').innerHTML = '<p>Error loading orders. Please try again.</p>';
+                });
+        }
+
+
+
+        function renderPendingOrdersTable(orders) {
+            if (!orders || orders.length === 0) {
+                document.getElementById('ordersTableContainer').innerHTML = '<p>No pending orders found.</p>';
+                return;
+            }
+
+            let tableHTML = `
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Contact</th>
+                    <th>Order-Date</th>
+                    <th>City</th>                 
+                    <th>Category</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+            orders.forEach(order => {
+                tableHTML += `
+            <tr>
+                <td>${order.name || 'N/A'}</td>
+                <td>${order.contact || 'N/A'}</td>
+                <td>${order.orderDate || 'N/A'}</td>
+                <td>${order.city || 'N/A'}</td>
+                <td>${order.category || 'N/A'}</td>
+                <td>
+                    <button class="action-btn view-order-btn" data-order-id="${order.id}" data-category="${order.category}">View</button>
+                </td>
+            </tr>
+        `;
+            });
+
+            tableHTML += `
+            </tbody>
+        </table>
+    `;
+
+            document.getElementById('ordersTableContainer').innerHTML = tableHTML;
+
+            // Add event listeners to view buttons
+            document.querySelectorAll('.view-order-btn').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    currentOrderId = this.getAttribute('data-order-id');
+                    currentCategory = this.getAttribute('data-category');
+                    fetchWorkers(currentCategory);
+                });
+            });
+        }
+
+        function renderAssignedOrdersTable(orders) {
+            if (!orders || orders.length === 0) {
+                document.getElementById('ordersTableContainer').innerHTML = '<p>No assigned orders found.</p>';
+                return;
+            }
+
+            let tableHTML = `
+        <table>
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th>Worker Name</th>
+                    <th>Phone</th>
+                    <th>Date</th>
+                    <th>City</th>
+                    <th>State</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+            orders.forEach(order => {
+                tableHTML += `
+            <tr>
+                <td>${order.category || 'N/A'}</td>
+                <td>${order.name || 'N/A'}</td>
+                <td>${order.contact || 'N/A'}</td>
+                <td>${order.orderDate || 'Not assigned'}</td>
+                <td>${order.city || 'N/A'}</td>
+                <td>${order.state || 'N/A'}</td>
+                <td>
+                    <button class="action-btn view-worker-details-btn" data-worker-id="${order.workerUid}">View Worker</button>
+                </td>
+            </tr>
+        `;
+            });
+
+            tableHTML += `
+            </tbody>
+        </table>
+    `;
+
+            document.getElementById('ordersTableContainer').innerHTML = tableHTML;
+
+            // Add event listeners to view worker buttons
+            document.querySelectorAll('.view-worker-details-btn').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const workerId = this.getAttribute('data-worker-id');
+                    fetchWorkerDetails(workerId);
+                });
+            });
+        }
+
+        function renderAcceptedOrdersTable(orders) {
+            if (!orders || orders.length === 0) {
+                document.getElementById('ordersTableContainer').innerHTML = '<p>No accepted orders found.</p>';
+                return;
+            }
+
+            let tableHTML = `
+        <table>
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th>Worker Name</th>
+                    <th>Phone</th>
+                    <th>Date</th>
+                    <th>City</th>
+                    <th>State</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+            orders.forEach(order => {
+                tableHTML += `
+            <tr>
+                <td>${order.category || 'N/A'}</td>
+                <td>${order.name || 'N/A'}</td>
+                <td>${order.contact || 'N/A'}</td>
+                <td>${order.orderDate || 'Not assigned'}</td>
+                <td>${order.city || 'N/A'}</td>
+                <td>${order.state || 'N/A'}</td>
+                <td>
+                    <button class="action-btn view-worker-details-btn" data-worker-id="${order.workerUid}">View Worker</button>
+                </td>
+            </tr>
+        `;
+            });
+
+            tableHTML += `
+            </tbody>
+        </table>
+    `;
+
+            document.getElementById('ordersTableContainer').innerHTML = tableHTML;
+
+            // Add event listeners to view worker buttons
+            document.querySelectorAll('.view-worker-details-btn').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const workerId = this.getAttribute('data-worker-id');
+                    fetchWorkerDetails(workerId);
+                });
+            });
+        }
+
+        function renderSuccessOrdersTable(orders) {
+            if (!orders || orders.length === 0) {
+                document.getElementById('ordersTableContainer').innerHTML = '<p>No completed orders found.</p>';
+                return;
+            }
+
+            let tableHTML = `
+        <table>
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th>Worker Name</th>
+                    <th>Phone</th>
+                    <th>Date</th>
+                    <th>City</th>
+                    <th>State</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+            orders.forEach(order => {
+                tableHTML += `
+            <tr>
+                <td>${order.category || 'N/A'}</td>
+                <td>${order.name || 'N/A'}</td>
+                <td>${order.contact || 'N/A'}</td>
+                <td>${order.orderDate || 'Not assigned'}</td>
+                <td>${order.city || 'N/A'}</td>
+                <td>${order.state || 'N/A'}</td>
+                <td>
+                    <button class="action-btn view-worker-details-btn" data-worker-id="${order.workerUid}">View Worker</button>
+                </td>
+            </tr>
+        `;
+            });
+
+            tableHTML += `
+            </tbody>
+        </table>
+    `;
+
+            document.getElementById('ordersTableContainer').innerHTML = tableHTML;
+
+            // Add event listeners to view worker buttons
+            document.querySelectorAll('.view-worker-details-btn').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const workerId = this.getAttribute('data-worker-id');
+                    fetchWorkerDetails(workerId);
+                });
+            });
+        }
+
+
+        // Fetch workers for a specific category  PENDING-BUTTON
+        function fetchWorkers(category) {
+            fetch(`${BASE_URL}/api/v1/get/workers/${category}`, {
+                headers: {
+                    'Authorization': 'Bearer ' + localStorage.getItem('token'),
+                    'Content-Type': 'application/json',
+                    'ngrok-skip-browser-warning': 'true'
+
+                }
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log("Fetched Workers Data in Pending:", data);
+                    // Store the workers data
+                    workersData = data.reduce((acc, worker) => {
+                        acc[worker.id] = worker;
+                        return acc;
+                    }, {});
+                    renderWorkersTable(data);
+                })
+                .catch(error => {
+                    console.error('Error fetching workers:', error);
+                    document.getElementById('workersTableContainer').innerHTML = '<p>Error loading workers. Please try again.</p>';
+                });
+        }
+
+        // Render workers table   PENDING-BUTTON
+        function renderWorkersTable(workers) {
+            if (!workers || workers.length === 0) {
+                document.getElementById('workersTableContainer').innerHTML = '<p>No workers found for this category.</p>';
+                return;
+            }
+
+            // Clear previous workers data
+            workersData = {};
+
+            let tableHTML = `
+        <table>
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Experience</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+            workers.forEach(worker => {
+                // Store worker data for later use
+                workersData[worker.id] = worker;
+
+                tableHTML += `
+            <tr>
+                <td>${worker.category || 'N/A'}</td>
+                <td>${worker.name || 'N/A'}</td>
+                <td>${worker.email || 'N/A'}</td>
+                <td>${worker.number || 'N/A'}</td>
+                <td>${worker.experience || 'N/A'}</td>
+                <td>
+                    <button class="action-btn view-worker-btn" 
+                            data-worker-id="${worker.id}" 
+                            data-worker-uid="${worker.worker_uid}">
+                        View
+                    </button>
+                </td>
+            </tr>
+        `;
+            });
+
+            tableHTML += `
+            </tbody>
+        </table>
+    `;
+
+            document.getElementById('workersTableContainer').innerHTML = tableHTML;
+            document.getElementById('ordersTableContainer').style.display = 'none';
+            document.getElementById('workersTableContainer').style.display = 'block';
+
+            // Add event listeners to view buttons
+            document.querySelectorAll('.view-worker-btn').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    currentWorkerId = this.getAttribute('data-worker-id');
+                    currentWorkerUid = this.getAttribute('data-worker-uid');
+
+                    // Fallback: If UID is not in data attribute, try to get it from stored worker data
+                    if (!currentWorkerUid && workersData[currentWorkerId]) {
+                        currentWorkerUid = workersData[currentWorkerId].uid;
+                    }
+
+                    console.log('Worker selected:', {
+                        id: currentWorkerId,
+                        uid: currentWorkerUid
+                    });
+
+                    showWorkerDetails(currentWorkerId, currentWorkerUid);
+                });
+            });
+        }
+
+
+        // show worker details PENDING BUTTON
+        function showWorkerDetails(workerId, workerUid) {
+            const worker = workersData[workerId];
+
+            if (!worker) {
+                console.error('Worker data not found for ID:', workerId);
+                document.getElementById('workerDetails').innerHTML = '<p>Error loading worker details.</p>';
+                document.getElementById('workerModal').style.display = 'flex';
+                return;
+            }
+
+            // Ensure we have the most up-to-date UID
+            if (!workerUid && worker.uid) {
+                currentWorkerUid = worker.uid;
+            }
+
+            let detailsHTML = `
+        <div>
+            <p><strong>Name:</strong> ${worker.name || 'N/A'}</p>
+            <p><strong>Email:</strong> ${worker.email || 'N/A'}</p>
+            <p><strong>Phone:</strong> ${worker.number || 'N/A'}</p>
+            <p><strong>Experience:</strong> ${worker.experience || 'N/A'}</p>
+            <p><strong>Worker ID:</strong> ${workerId}</p>
+            <p><strong>Worker UID:</strong> ${currentWorkerUid || 'Not available'}</p>
+        </div>
+    `;
+
+            document.getElementById('workerDetails').innerHTML = detailsHTML;
+            document.getElementById('assignWorker').style.display = 'block';
+            document.getElementById('workerModal').style.display = 'flex';
+        }
+
+
+        //Assign to worker  PENDING BUTTON
+        function assignWorkerToOrder() {
+            // Final validation before assignment
+            if (!currentOrderId) {
+                alert('No order selected for assignment');
+                return;
+            }
+
+            if (!currentWorkerId || !currentWorkerUid) {
+                // Try to get UID from stored worker data as last resort
+                if (workersData[currentWorkerId] && workersData[currentWorkerId].uid) {
+                    currentWorkerUid = workersData[currentWorkerId].uid;
+                } else {
+                    alert('Worker information incomplete. Please select a worker again.');
+                    return;
+                }
+            }
+
+            console.log('Assigning worker:', {
+                orderId: currentOrderId,
+                workerId: currentWorkerId,
+                workerUid: currentWorkerUid
+            });
+
+            fetch(`${BASE_URL}/api/v1/assign/order/${currentOrderId}/${currentWorkerId}/${currentWorkerUid}`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': 'Bearer ' + localStorage.getItem('token'),
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'ngrok-skip-browser-warning': 'true'
+                },
+                body: JSON.stringify({})
+            })
+                .then(async response => {
+                    const data = await response.json();
+
+                    if (!response.ok) {
+                        throw new Error(data.message || 'Assignment failed');
+                    }
+
+                    return data;
+                })
+                .then(data => {
+                    console.log('Response from assign:', data);
+
+                    if (data.message?.toLowerCase().includes('assigned')) {
+                        alert('Worker assigned successfully!');
+                        document.getElementById('workerModal').style.display = 'none';
+                        fetchOrders('/api/v1/pending'); // Refresh orders
+                    } else {
+                        throw new Error(data.message || 'Assignment failed');
+                    }
+                })
+                .catch(error => {
+                    console.error('Assignment error:', error);
+                    alert(`Assignment failed: ${error.message}`);
+                });
+        }
+
+
+
+
+
+        // Add this function to fetch worker details for assigned/accepted/success orders
+        function fetchWorkerDetails(workerId) {
+            fetch(`${BASE_URL}/api/v1/worker/get/${workerId}`, {
+                headers: {
+                    'Authorization': 'Bearer ' + localStorage.getItem('token'),
+                    'Accept': 'application/json',
+                    'ngrok-skip-browser-warning': 'true'
+                }
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(workerDetails => {
+                    console.log('Worker details fetched:', workerDetails);
+
+                    let detailsHTML = `
+                <div>
+                    <p><strong>Name:</strong> ${workerDetails.name || 'N/A'}</p>
+                    <p><strong>Email:</strong> ${workerDetails.email || 'N/A'}</p>
+                    <p><strong>Phone:</strong> ${workerDetails.number || workerDetails.phone || 'N/A'}</p>
+                    <p><strong>Experience:</strong> ${workerDetails.experience || 'N/A'}</p>
+                    <p><strong>Category:</strong> ${workerDetails.category || 'N/A'}</p>
+                   
+                </div>
+            `;
+
+                    document.getElementById('workerDetails').innerHTML = detailsHTML;
+                    document.getElementById('assignWorker').style.display = 'none'; // Hide assign for assigned view
+                    document.getElementById('workerModal').style.display = 'flex';
+                })
+                .catch(error => {
+                    console.error('Error fetching worker details:', error);
+                    document.getElementById('workerDetails').innerHTML = '<p>Error loading worker details.</p>';
+                    document.getElementById('assignWorker').style.display = 'none';
+                    document.getElementById('workerModal').style.display = 'flex';
+                });
+        }
+
+
+
+        // Load pending orders by default
+        window.addEventListener('DOMContentLoaded', function () {
+            fetchOrders('/api/v1/pending');
+        });
+    </script>
+</body>
+
+</html>

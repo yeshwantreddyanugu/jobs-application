@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Common Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f0f2f5;
+        }
+
+        /* Login Page Styles */
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .login-form {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            width: 350px;
+            transform: translateY(-20px);
+            animation: slideUp 0.5s ease forwards;
+        }
+
+        @keyframes slideUp {
+            to {
+                transform: translateY(0);
+            }
+        }
+
+        .login-form h1 {
+            text-align: center;
+            color: #2d3748;
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #4a5568;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 0.8rem;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .login-btn:hover {
+            background: #5a67d8;
+            transform: translateY(-1px);
+        }
+
+        /* Dashboard Styles */
+        .dashboard {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: #2d3748;
+            color: white;
+            position: fixed;
+            height: 100%;
+            padding: 1rem;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar-header {
+            padding: 1rem;
+            border-bottom: 1px solid #4a5568;
+            margin-bottom: 1rem;
+        }
+
+        .sidebar-header h2 {
+            color: #fff;
+            font-size: 1.5rem;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .menu-item {
+            padding: 0.8rem;
+            margin: 0.5rem 0;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            color: #cbd5e0;
+        }
+
+        .menu-item:hover {
+            background: #4a5568;
+            color: #fff;
+        }
+
+        .menu-item.active {
+            background: #667eea;
+            color: #fff;
+        }
+
+        .menu-item i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .main-content {
+            margin-left: 250px;
+            padding: 2rem;
+            width: calc(100% - 250px);
+        }
+
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .content-header h1 {
+            color: #2d3748;
+            font-size: 1.8rem;
+        }
+
+        .logout-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logout-btn:hover {
+            background: #5a67d8;
+            transform: translateY(-1px);
+        }
+
+        /* Banner Upload Styles */
+        .banner-container {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .upload-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .upload-area {
+            border: 2px dashed #cbd5e0;
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 1rem;
+        }
+
+        .upload-area:hover {
+            border-color: #667eea;
+            background: #f8fafc;
+        }
+
+        .upload-area i {
+            font-size: 3rem;
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+
+        .upload-area p {
+            color: #4a5568;
+            margin-bottom: 1rem;
+        }
+
+        .upload-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .upload-btn:hover {
+            background: #5a67d8;
+        }
+
+        .preview-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .preview-title {
+            color: #2d3748;
+            margin-bottom: 1.5rem;
+            font-size: 1.3rem;
+        }
+
+        .banner-preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+        }
+
+        .banner-card {
+            width: 300px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            position: relative;
+            transition: transform 0.3s ease;
+        }
+
+        .banner-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .banner-image {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+        }
+
+        .banner-actions {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .delete-btn {
+            background: #e53e3e;
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .delete-btn:hover {
+            background: #c53030;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="dashboard">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>Admin Panel</h2>
+            </div>
+            <ul class="sidebar-menu">
+                <li class="menu-item " onclick="window.location.href='dashboard.html'">
+                    <i class="fas fa-home"></i>
+                    Home
+                </li>
+                <li class="menu-item" onclick="window.location.href='services.html'">
+                    <i class="fas fa-concierge-bell"></i>
+                    Services
+                </li>
+                <li class="menu-item" onclick="window.location.href='workers.html'">
+                    <i class="fas fa-users"></i>
+                    Workers
+                </li>
+                <li class="menu-item " onclick="window.location.href='orders.html'">
+                    <i class="fas fa-clipboard-list"></i>
+                    Orders
+                </li>
+                <li class="menu-item " onclick="window.location.href='promotions.html'">
+                    <i class="fas fa-clipboard-list"></i>Promotions
+                </li>
+                <li class="menu-item active" onclick="window.location.href='banner.html'">
+                    <i class="fas fa-image"></i>
+                    <span>Banner Upload</span>
+                </li>
+                <li class="menu-item" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Logout
+                </li>
+            </ul>
+        </div>
+
+        <div class="main-content">
+            <div class="content-header">
+                <h1>Banner Upload</h1>
+            </div>
+
+            <div class="banner-container">
+                <div class="upload-section">
+                    <h2>Upload New Banner</h2>
+                    <div class="upload-area" id="uploadArea">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p>Drag & drop your banner image here or click to browse</p>
+                        <input type="file" id="bannerUpload" accept="image/*" class="hidden">
+                        <button class="upload-btn" id="uploadBtn">Select Image</button>
+                    </div>
+                    <div class="hidden" id="selectedFileInfo">
+                        <p>Selected file: <span id="fileName"></span></p>
+                        <button class="upload-btn" id="submitBtn">Upload Banner</button>
+                    </div>
+                </div>
+
+                <div class="preview-section">
+                    <h3 class="preview-title">Current Banners</h3>
+                    <div class="banner-preview" id="bannerPreview">
+                        <!-- Banners will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Base URL for API endpoints
+        const BASE_URL = 'https://your-api-domain.com/api'; // Replace with your actual API base URL
+        
+        // Authentication check
+        if (!localStorage.getItem('isLoggedIn')) {
+            window.location.href = 'index.html';
+        }
+
+        // Logout functionality
+        document.getElementById('logoutBtn').addEventListener('click', function () {
+            localStorage.removeItem('isLoggedIn');
+            window.location.href = 'index.html';
+            // Prevent back button navigation
+            history.replaceState(null, null, 'index.html');
+        });
+
+        // DOM Elements
+        const uploadArea = document.getElementById('uploadArea');
+        const bannerUpload = document.getElementById('bannerUpload');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const selectedFileInfo = document.getElementById('selectedFileInfo');
+        const fileName = document.getElementById('fileName');
+        const submitBtn = document.getElementById('submitBtn');
+        const bannerPreview = document.getElementById('bannerPreview');
+
+        // Event Listeners
+        uploadBtn.addEventListener('click', () => bannerUpload.click());
+        uploadArea.addEventListener('click', () => bannerUpload.click());
+        bannerUpload.addEventListener('change', handleFileSelect);
+        submitBtn.addEventListener('click', uploadBanner);
+
+        // Load existing banners on page load
+        document.addEventListener('DOMContentLoaded', fetchBanners);
+
+        // Handle file selection
+        function handleFileSelect(e) {
+            const file = e.target.files[0];
+            if (file) {
+                if (!file.type.match('image.*')) {
+                    alert('Please select an image file');
+                    return;
+                }
+                
+                fileName.textContent = file.name;
+                selectedFileInfo.classList.remove('hidden');
+                
+                // Preview the selected image
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    uploadArea.innerHTML = `
+                        <img src="${e.target.result}" alt="Preview" style="max-width: 100%; max-height: 200px; border-radius: 4px;">
+                        <p>${file.name}</p>
+                        <button class="upload-btn" id="changeBtn">Change Image</button>
+                    `;
+                    document.getElementById('changeBtn').addEventListener('click', () => {
+                        bannerUpload.value = '';
+                        uploadArea.innerHTML = `
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <p>Drag & drop your banner image here or click to browse</p>
+                            <input type="file" id="bannerUpload" accept="image/*" class="hidden">
+                            <button class="upload-btn" id="uploadBtn">Select Image</button>
+                        `;
+                        selectedFileInfo.classList.add('hidden');
+                        // Reattach event listeners
+                        document.getElementById('uploadBtn').addEventListener('click', () => bannerUpload.click());
+                        bannerUpload.addEventListener('change', handleFileSelect);
+                    });
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Upload banner to server
+        async function uploadBanner() {
+            const file = bannerUpload.files[0];
+            if (!file) {
+                alert('Please select an image first');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('banner', file);
+
+            try {
+                const response = await fetch(`${BASE_URL}/banners`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.message || 'Failed to upload banner');
+                }
+
+                alert('Banner uploaded successfully!');
+                fetchBanners();
+                resetUploadForm();
+            } catch (error) {
+                console.error('Upload error:', error);
+                alert('Error uploading banner: ' + error.message);
+            }
+        }
+
+        // Fetch all banners from server
+        async function fetchBanners() {
+            try {
+                const response = await fetch(`${BASE_URL}/banners`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+
+                const banners = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(banners.message || 'Failed to fetch banners');
+                }
+
+                renderBanners(banners);
+            } catch (error) {
+                console.error('Fetch error:', error);
+                alert('Error loading banners: ' + error.message);
+            }
+        }
+
+        // Render banners in the preview section
+        function renderBanners(banners) {
+            bannerPreview.innerHTML = '';
+            
+            if (banners.length === 0) {
+                bannerPreview.innerHTML = '<p>No banners available</p>';
+                return;
+            }
+
+            banners.forEach(banner => {
+                const bannerCard = document.createElement('div');
+                bannerCard.className = 'banner-card';
+                bannerCard.innerHTML = `
+                    <img src="${banner.url}" alt="Banner" class="banner-image">
+                    <div class="banner-actions">
+                        <button class="delete-btn" data-id="${banner.id}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+                bannerPreview.appendChild(bannerCard);
+            });
+
+            // Add event listeners to delete buttons
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', deleteBanner);
+            });
+        }
+
+        // Delete a banner
+        async function deleteBanner(e) {
+            const bannerId = e.currentTarget.getAttribute('data-id');
+            if (!confirm('Are you sure you want to delete this banner?')) return;
+
+            try {
+                const response = await fetch(`${BASE_URL}/banners/${bannerId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.message || 'Failed to delete banner');
+                }
+
+                alert('Banner deleted successfully!');
+                fetchBanners();
+            } catch (error) {
+                console.error('Delete error:', error);
+                alert('Error deleting banner: ' + error.message);
+            }
+        }
+
+        // Reset upload form
+        function resetUploadForm() {
+            bannerUpload.value = '';
+            selectedFileInfo.classList.add('hidden');
+            uploadArea.innerHTML = `
+                <i class="fas fa-cloud-upload-alt"></i>
+                <p>Drag & drop your banner image here or click to browse</p>
+                <input type="file" id="bannerUpload" accept="image/*" class="hidden">
+                <button class="upload-btn" id="uploadBtn">Select Image</button>
+            `;
+            // Reattach event listeners
+            document.getElementById('uploadBtn').addEventListener('click', () => bannerUpload.click());
+            bannerUpload.addEventListener('change', handleFileSelect);
+        }
+    </script>
+</body>
+
+</html>

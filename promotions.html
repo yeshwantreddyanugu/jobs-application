@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Promotions</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Common Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f0f2f5;
+        }
+
+        /* Login Page Styles */
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .login-form {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            width: 350px;
+            transform: translateY(-20px);
+            animation: slideUp 0.5s ease forwards;
+        }
+
+        @keyframes slideUp {
+            to {
+                transform: translateY(0);
+            }
+        }
+
+        .login-form h1 {
+            text-align: center;
+            color: #2d3748;
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #4a5568;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 0.8rem;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .login-btn:hover {
+            background: #5a67d8;
+            transform: translateY(-1px);
+        }
+
+        /* Dashboard Styles */
+        .dashboard {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: #2d3748;
+            color: white;
+            position: fixed;
+            height: 100%;
+            padding: 1rem;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar-header {
+            padding: 1rem;
+            border-bottom: 1px solid #4a5568;
+            margin-bottom: 1rem;
+        }
+
+        .sidebar-header h2 {
+            color: #fff;
+            font-size: 1.5rem;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .menu-item {
+            padding: 0.8rem;
+            margin: 0.5rem 0;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            color: #cbd5e0;
+        }
+
+        .menu-item:hover {
+            background: #4a5568;
+            color: #fff;
+        }
+
+        .menu-item.active {
+            background: #667eea;
+            color: #fff;
+        }
+
+        .menu-item i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .main-content {
+            margin-left: 250px;
+            padding: 2rem;
+            width: calc(100% - 250px);
+        }
+
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .content-header h1 {
+            color: #2d3748;
+            font-size: 1.8rem;
+        }
+
+        .logout-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logout-btn:hover {
+            background: #5a67d8;
+            transform: translateY(-1px);
+        }
+
+        /* Promotions Table Styles */
+        .promotions-container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            padding: 1.5rem;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .add-promotion-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 0.6rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .add-promotion-btn:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+        }
+
+        .promotions-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .promotions-table thead {
+            background-color: #667eea;
+            color: white;
+            position: sticky;
+            top: 0;
+        }
+
+        .promotions-table th {
+            padding: 1rem;
+            text-align: left;
+        }
+
+        .promotions-table tbody {
+            display: block;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .promotions-table thead tr,
+        .promotions-table tbody tr {
+            display: table;
+            width: 100%;
+            table-layout: fixed;
+        }
+
+        .promotions-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+            vertical-align: middle;
+        }
+
+        .promotions-table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .view-btn,
+        .delete-btn {
+            padding: 0.5rem 0.8rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-size: 0.9rem;
+        }
+
+        .view-btn {
+            background-color: #48bb78;
+            color: white;
+        }
+
+        .view-btn:hover {
+            background-color: #38a169;
+        }
+
+        .delete-btn {
+            background-color: #f56565;
+            color: white;
+        }
+
+        .delete-btn:hover {
+            background-color: #e53e3e;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            border-radius: 8px;
+            width: 500px;
+            max-width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            animation: modalFadeIn 0.3s ease;
+        }
+
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            color: #2d3748;
+            font-size: 1.5rem;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #718096;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .promotion-detail {
+            margin-bottom: 1rem;
+        }
+
+        .promotion-detail label {
+            display: block;
+            color: #4a5568;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .promotion-detail p {
+            background-color: #f8f9fa;
+            padding: 0.8rem;
+            border-radius: 4px;
+            border-left: 3px solid #667eea;
+        }
+
+        /* Add Promotion Form Styles */
+        .add-promotion-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .form-row {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-row label {
+            color: #4a5568;
+            font-weight: 500;
+        }
+
+        .form-row input,
+        .form-row textarea {
+            padding: 0.8rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-row textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .form-row input:focus,
+        .form-row textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .cancel-btn,
+        .submit-btn {
+            padding: 0.7rem 1.2rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .cancel-btn {
+            background-color: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .cancel-btn:hover {
+            background-color: #cbd5e0;
+        }
+
+        .submit-btn {
+            background-color: #667eea;
+            color: white;
+        }
+
+        .submit-btn:hover {
+            background-color: #5a67d8;
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #48bb78;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 5px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1001;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast.error {
+            background-color: #f56565;
+        }
+
+        .toast i {
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="dashboard">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>Admin Panel</h2>
+            </div>
+            <ul class="sidebar-menu">
+                <li class="menu-item " onclick="window.location.href='dashboard.html'">
+                    <i class="fas fa-home"></i>
+                    Home
+                </li>
+                <li class="menu-item" onclick="window.location.href='services.html'">
+                    <i class="fas fa-concierge-bell"></i>
+                    Services
+                </li>
+                <li class="menu-item" onclick="window.location.href='workers.html'">
+                    <i class="fas fa-users"></i>
+                    Workers
+                </li>
+                <li class="menu-item " onclick="window.location.href='orders.html'">
+                    <i class="fas fa-clipboard-list"></i>
+                    Orders
+                </li>
+                <li class="menu-item active" onclick="window.location.href='promotions.html'">
+                    <i class="fas fa-bullhorn"></i>
+                    Promotions
+                </li>
+                <li class="menu-item" onclick="window.location.href='banner.html'">
+                    <i class="fas fa-image"></i>
+                    <span>Banner Upload</span>
+                </li>
+                <li class="menu-item" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Logout
+                </li>
+            </ul>
+        </div>
+
+        <div class="main-content">
+            <div class="content-header">
+                <h1>Promotions</h1>
+            </div>
+
+            <div class="promotions-container">
+                <div class="table-header">
+                    <h2>Current Promotions</h2>
+                    <button class="add-promotion-btn" id="addPromotionBtn">
+                        <i class="fas fa-plus"></i> Add Promotion
+                    </button>
+                </div>
+
+                <table class="promotions-table">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Discount</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="promotionsTableBody">
+                        <!-- Promotions will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Promotion Modal -->
+    <div class="modal" id="viewPromotionModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Promotion Details</h2>
+                <button class="close-btn" id="closeViewModal">&times;</button>
+            </div>
+            <div class="modal-body" id="promotionDetails">
+                <!-- Promotion details will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Promotion Modal -->
+    <div class="modal" id="addPromotionModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add New Promotion</h2>
+                <button class="close-btn" id="closeAddModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form class="add-promotion-form" id="addPromotionForm">
+                    <div class="form-row">
+                        <label for="promotionTitle">Title</label>
+                        <input type="text" id="promotionTitle" required>
+                    </div>
+                    <div class="form-row">
+                        <label for="promotionDiscount">Discount</label>
+                        <input type="text" id="promotionDiscount" required>
+                    </div>
+                    <div class="form-row">
+                        <label for="promotionBody">Description</label>
+                        <textarea id="promotionBody" required></textarea>
+                    </div>
+                    <div class="form-row">
+                        <label for="promotionLink">Link</label>
+                        <input type="text" id="promotionLink" required>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="cancel-btn" id="cancelAddPromotion">Cancel</button>
+                        <button type="submit" class="submit-btn">Save Promotion</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toastNotification">
+        <i class="fas fa-check-circle"></i>
+        <span id="toastMessage">Operation completed successfully</span>
+    </div>
+
+    <script>
+        
+        const BASE_URL = 'https://5134-2401-4900-1c27-9d34-258e-e24-111f-6129.ngrok-free.app';
+
+        let promotionsData = [];
+
+        if (!localStorage.getItem('isLoggedIn')) {
+            window.location.href = 'index.html';
+        }
+
+        const promotionsTableBody = document.getElementById('promotionsTableBody');
+        const viewPromotionModal = document.getElementById('viewPromotionModal');
+        const addPromotionModal = document.getElementById('addPromotionModal');
+        const promotionDetails = document.getElementById('promotionDetails');
+        const closeViewModal = document.getElementById('closeViewModal');
+        const closeAddModal = document.getElementById('closeAddModal');
+        const addPromotionBtn = document.getElementById('addPromotionBtn');
+        const addPromotionForm = document.getElementById('addPromotionForm');
+        const cancelAddPromotion = document.getElementById('cancelAddPromotion');
+        const toastNotification = document.getElementById('toastNotification');
+        const toastMessage = document.getElementById('toastMessage');
+
+        const headers = {
+            'Content-Type': 'application/json',
+            'ngrok-skip-browser-warning': 'true'
+        };
+
+        async function fetchPromotions() {
+            try {
+                const response = await fetch(`${BASE_URL}/api/v1/get/promotions`, { method: 'GET', headers });
+                if (!response.ok) throw new Error('Failed to fetch promotions');
+                promotionsData = await response.json();
+                console.log('Fetched Promotions:', promotionsData);
+                renderPromotionsTable();
+            } catch (error) {
+                showToast('Failed to load promotions', true);
+            }
+        }
+
+        function renderPromotionsTable() {
+            promotionsTableBody.innerHTML = '';
+            if (!promotionsData.length) {
+                promotionsTableBody.innerHTML = '<tr><td colspan="3" style="text-align:center;">No promotions found</td></tr>';
+                return;
+            }
+            promotionsData.forEach(promo => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                <td>${promo.title}</td>
+                <td>${promo.discount}</td>
+                <td>
+                    <div class="action-buttons">
+                        <button class="view-btn" data-id="${promo.id}"><i class="fas fa-eye"></i> View</button>
+                        <button class="delete-btn" data-id="${promo.id}"><i class="fas fa-trash"></i> Delete</button>
+                    </div>
+                </td>`;
+                promotionsTableBody.appendChild(row);
+            });
+
+            document.querySelectorAll('.view-btn').forEach(btn => {
+                btn.addEventListener('click', e => {
+                    const id = e.currentTarget.dataset.id;
+                    const promo = promotionsData.find(p => p.id === id);
+                    if (promo) {
+                        promotionDetails.innerHTML = `
+                        <div class="promotion-detail"><label>Title</label><p>${promo.title}</p></div>
+                        <div class="promotion-detail"><label>Discount</label><p>${promo.discount}</p></div>
+                        <div class="promotion-detail"><label>Description</label><p>${promo.body}</p></div>
+                        <div class="promotion-detail"><label>Link</label><p>${promo.link}</p></div>
+                    `;
+                        viewPromotionModal.style.display = 'flex';
+                    }
+                });
+            });
+
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', async e => {
+                    const id = e.currentTarget.dataset.id; // id instead of uid
+                    if (!confirm('Delete this promotion?')) return;
+                    try {
+                        const res = await fetch(`${BASE_URL}/api/v1/promotion/delete1/${id}`, {
+                            method: 'DELETE',
+                            headers
+                        });
+                        const json = await res.json();
+                        if (json.status === 'success') {
+                            promotionsData = promotionsData.filter(p => p.id !== id); // filter by id
+                            renderPromotionsTable();
+                            showToast('Promotion deleted');
+                        } else throw new Error(json.message);
+                    } catch (err) {
+                        showToast('Error deleting promotion', true);
+                        console.error(err);
+                    }
+                });
+            });
+
+        }
+
+
+        //save promotion
+        addPromotionForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const newPromo = {
+                title: document.getElementById('promotionTitle').value.trim(),
+                discount: document.getElementById('promotionDiscount').value.trim(),
+                body: document.getElementById('promotionBody').value.trim(),
+                link: document.getElementById('promotionLink').value.trim()
+            };
+
+            console.log('📦 Submitting Promotion:', newPromo);
+
+            try {
+                const response = await fetch(`${BASE_URL}/api/v1/promotion/save`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'ngrok-skip-browser-warning': 'true',
+                        'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+                    },
+                    body: JSON.stringify(newPromo)
+                });
+
+                const rawText = await response.text();
+                console.log('📥 Raw Response:', rawText);
+
+                // Try to parse as JSON regardless of content-type
+                let json;
+                try {
+                    json = JSON.parse(rawText);
+                } catch (parseError) {
+                    console.warn('⚠️ Response was not valid JSON, but status was:', response.status);
+                    if (response.ok) {
+                        // If the response is successful but not JSON, treat it as success
+                        showToast('Promotion added successfully');
+                        addPromotionModal.style.display = 'none';
+                        addPromotionForm.reset();
+                        await fetchPromotions();
+                        return;
+                    }
+                    throw new Error(rawText || 'Save failed');
+                }
+
+                if (!response.ok) {
+                    throw new Error(json.message || 'Save failed');
+                }
+
+                if (json.status === 'success') {
+                    showToast(json.message || 'Promotion added successfully');
+                    addPromotionModal.style.display = 'none';
+                    addPromotionForm.reset();
+                    await fetchPromotions();
+                } else {
+                    throw new Error(json.message || 'Save failed');
+                }
+
+            } catch (err) {
+                console.error('❌ Error while saving promotion:', err);
+                showToast('Error: ' + (err.message || 'Failed to save promotion'), true);
+            }
+        });
+
+
+
+        function showToast(msg, error = false) {
+            toastMessage.textContent = msg;
+            toastNotification.className = error ? 'toast error show' : 'toast show';
+            setTimeout(() => toastNotification.classList.remove('show'), 3000);
+        }
+
+        closeViewModal.onclick = () => viewPromotionModal.style.display = 'none';
+        closeAddModal.onclick = () => addPromotionModal.style.display = 'none';
+        addPromotionBtn.onclick = () => addPromotionModal.style.display = 'flex';
+        cancelAddPromotion.onclick = () => {
+            addPromotionModal.style.display = 'none';
+            addPromotionForm.reset();
+        };
+        window.onclick = e => {
+            if (e.target === viewPromotionModal) viewPromotionModal.style.display = 'none';
+            if (e.target === addPromotionModal) addPromotionModal.style.display = 'none';
+        };
+        document.getElementById('logoutBtn').onclick = () => {
+            localStorage.removeItem('isLoggedIn');
+            localStorage.removeItem('authToken');
+            window.location.href = 'index.html';
+        };
+        document.addEventListener('DOMContentLoaded', fetchPromotions);
+    </script>
+</body>
+
+</html>
