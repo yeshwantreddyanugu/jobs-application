@@ -546,7 +546,7 @@
     </div>
 
     <script>
-        const BASE_URL = 'https://5134-2401-4900-1c27-9d34-258e-e24-111f-6129.ngrok-free.app/api/v1';
+        const BASE_URL = 'https://shashirepo.lytortech.com/api/v1';
 
         document.getElementById('logoutBtn').addEventListener('click', () => {
             localStorage.removeItem('isLoggedIn');
@@ -640,6 +640,10 @@
                     <div class="detail-item">
                         <div class="detail-label">Experience</div>
                         <div class="detail-value">${worker.experience || 'N/A'}</div>
+                    </div>
+                     <div class="detail-item">
+                        <div class="detail-label"> Worker's Code</div>
+                        <div class="detail-value">${worker.code || 'N/A'}</div>
                     </div>
                 `;
 

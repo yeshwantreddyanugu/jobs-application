@@ -633,70 +633,75 @@
             <div id="childServiceModal" class="modal">
                 <div class="modal-content">
                     <span class="close">&times;</span>
-                    <h3 id="childServiceModalTitle">Add Child Service</h3>
+                    <h2 id="childServiceModalTitle">Add Child Service</h2>
                     <form id="childServiceForm" enctype="multipart/form-data">
+                        <!-- Image Upload -->
                         <div class="form-group">
                             <label for="childServiceImage">Service Image*</label>
                             <input type="file" id="childServiceImage" name="childServiceImage" accept="image/*"
-                                required>
-                            <img id="childImagePreview" class="image-preview" src="#" alt="Image Preview">
+                                required />
+                            <img id="childImagePreview" class="image-preview" src="#" alt="Image Preview"
+                                style="max-height: 120px; margin-top: 8px;" />
                         </div>
 
+                        <!-- Service Name -->
                         <div class="form-group">
                             <label for="childServiceName">Service Name*</label>
-                            <input type="text" id="childServiceName" name="childServiceName" required>
+                            <input type="text" id="childServiceName" name="childServiceName" required />
                         </div>
 
+                        <!-- Category -->
                         <div class="form-group">
                             <label for="category">Category*</label>
                             <select id="category" name="category" required>
                                 <option value="">-- Select Category --</option>
-                                <!-- Options will be populated by JavaScript -->
+                                <!-- Populate via JS -->
                             </select>
                         </div>
 
+                        <!-- Quantity -->
                         <div class="form-group">
-                            <div class="form-col">
-                                <label for="price">Price*</label>
-                                <input type="number" id="price" name="price" step="0.01" min="0" required>
-                            </div>
-                            <div class="form-col">
-                                <label for="originalPrice">Original Price</label>
-                                <input type="number" id="originalPrice" name="originalPrice" step="0.01" min="0">
-                            </div>
+                            <label for="quantity">Quantity*</label>
+                            <input type="number" id="quantity" name="quantity" min="1" required />
                         </div>
 
+                        <!-- Unit -->
                         <div class="form-group">
-                            <div class="form-col">
-                                <label for="quantity">Quantity*</label>
-                                <input type="number" id="quantity" name="quantity" min="0" required>
-                            </div>
-                            <div class="form-col">
-                                <label for="serviceId">Service ID*</label>
-                                <input type="number" id="serviceId" name="serviceId" min="0" required>
-                            </div>
+                            <label for="unit">Unit*</label>
+                            <input type="number" id="unit" name="unit" value="1" readonly />
                         </div>
 
+                        <!-- Original Price -->
                         <div class="form-group">
-                            <div class="form-col">
-                                <label for="discountPercentage">Discount Percentage</label>
-                                <input type="number" id="discountPercentage" name="discountPercentage" min="0"
-                                    max="100">
-                            </div>
-                            <div class="form-col">
-                                <label for="discountPrice">Discount Price</label>
-                                <input type="number" id="discountPrice" name="discountPrice" step="0.01" min="0">
-                            </div>
+                            <label for="originalPrice">Original Price (per unit)*</label>
+                            <input type="number" id="originalPrice" name="originalPrice" min="0" required />
                         </div>
 
+                        <!-- Discount Percentage -->
                         <div class="form-group">
-                            <div class="form-col">
-                                <label for="rating">Rating</label>
-                                <input type="number" id="rating" name="rating" step="0.1" min="0" max="5">
-                            </div>
-
+                            <label for="discountPercentage">Discount Percentage (%)</label>
+                            <input type="number" id="discountPercentage" name="discountPercentage" min="0" max="100" />
                         </div>
 
+                        <!-- Discount Price -->
+                        <div class="form-group">
+                            <label for="discountPrice">Discount Price (per unit)</label>
+                            <input type="number" id="discountPrice" name="discountPrice" min="0" />
+                        </div>
+
+                        <!-- Final Price -->
+                        <div class="form-group">
+                            <label for="price">Final Price (after discount)*</label>
+                            <input type="number" id="price" name="price" min="0" required />
+                        </div>
+
+                        <!-- Rating -->
+                        <div class="form-group">
+                            <label for="rating">Service Rating (0.0 - 5.0)</label>
+                            <input type="number" id="rating" name="rating" min="0" max="5" step="0.1" />
+                        </div>
+
+                        <!-- Submit Button -->
                         <div class="form-group">
                             <button type="submit">Save Child Service</button>
                         </div>
@@ -724,49 +729,49 @@
             "Carpenter",
             "Electrician",
             "HVAC Technician (Heating/Ventilation/Air Conditioning)",
-            "Landscaper/Gardener",
-            "Painter (Interior/Exterior)",
+            "Landscaper-Gardener",
+            "Painter ",
             "Roofer",
-            "Masonry/Concrete Worker",
-            "Handyman (General Repairs)",
-            "Drywall Installer/Repairer",
-            "Flooring Installer (Tile, Hardwood, Carpet)",
-            "Window/Glass Repair Technician",
-            "Deck/Patio Builder",
+            "Masonry-Concrete Worker",
+            "Handyman",
+            "Drywall Installer-Repairer",
+            "Flooring Installer",
+            "Window-Glass Repair Technician",
+            "Deck-Patio Builder",
             "House Cleaner",
-            "Carpet/Upholstery Cleaner",
+            "Carpet-Upholstery Cleaner",
             "Pest Control Specialist",
             "Pressure Washing Service",
             "Chimney Sweep",
-            "Moving/Relocation Service",
-            "Storage/Storage Unit Provider",
+            "Moving-Relocation Service",
+            "Storage-Storage Unit Provider",
             "Junk Removal Service",
-            "Appliance Repair Technician (Refrigerator, Washing Machine, etc.)",
+            "Appliance Repair Technician",
             "Locksmith",
             "Solar Panel Installer",
             "Home Automation Technician",
-            "Computer/IT Repair Technician",
+            "Computer-IT Repair Technician",
             "Interior Designer",
             "Bathroom Remodeler",
             "Kitchen Remodeler",
-            "General Contractor (Renovations)",
-            "Upholstery/Furniture Repair",
+            "General Contractor",
+            "Upholstery-Furniture Repair",
             "Fire Safety Inspector",
             "Security System Installer",
-            "Fence/Gate Installer",
+            "Fence-Gate Installer",
             "Mobile Mechanic",
             "Car Detailer",
             "Tire Service Technician",
             "Home Health Aide",
-            "Personal Trainer (In-Home)",
-            "Massage Therapist (Mobile)",
+            "Personal Trainer",
+            "Massage Therapist",
             "Event Planner",
             "Caterer",
-            "Photographer/Videographer",
+            "Photographer-Videographer",
             "Welder",
             "Blacksmith",
             "Scaffolding Supplier",
-            "Waste Management/Recycling Service"
+            "Waste Management-Recycling Service"
         ];
 
         // Authentication check
@@ -790,7 +795,7 @@
         });
 
         // Replace with your actual API base URL
-        const BASE_URL = 'https://4e9b-2401-4900-1cb4-c2a8-d546-3031-2f29-a78.ngrok-free.app/api/v1';
+        const BASE_URL = 'https://shashirepo.lytortech.com/api/v1';
         let currentEditingChildId = null;
         let services = [];
         let childServices = [];
@@ -825,6 +830,37 @@
                         preview.style.display = 'block';
                     }
                     reader.readAsDataURL(this.files[0]);
+                }
+            });
+
+            // Add this new event listener for automatic discount calculation
+            document.getElementById('discountPercentage').addEventListener('change', function () {
+                const originalPrice = parseFloat(document.getElementById('originalPrice').value) || 0;
+                const discountPercentage = parseFloat(this.value) || 0;
+
+                if (discountPercentage > 0) {
+                    const discountAmount = originalPrice * (discountPercentage / 100);
+                    const discountPrice = originalPrice - discountAmount;
+
+                    document.getElementById('discountPrice').value = discountPrice.toFixed(2);
+                    document.getElementById('price').value = discountPrice.toFixed(2);
+                } else {
+                    document.getElementById('discountPrice').value = '';
+                    document.getElementById('price').value = originalPrice.toFixed(2);
+                }
+            });
+
+
+            // You might also want to add the same logic for when originalPrice changes
+            document.getElementById('originalPrice').addEventListener('change', function () {
+                const discountPercentage = parseFloat(document.getElementById('discountPercentage').value) || 0;
+                if (discountPercentage > 0) {
+                    const originalPrice = parseFloat(this.value) || 0;
+                    const discountAmount = originalPrice * (discountPercentage / 100);
+                    const discountPrice = originalPrice - discountAmount;
+
+                    document.getElementById('discountPrice').value = discountPrice.toFixed(2);
+                    document.getElementById('price').value = discountPrice.toFixed(2);
                 }
             });
         });
@@ -920,7 +956,7 @@
                     throw new Error(`Failed to fetch main services: ${servicesResponse.status}`);
                 }
                 services = await servicesResponse.json();
-                console.log("📦 Loaded ChildServices from response:", services);
+                console.log("📦 Loaded MainServices from response:", services);
                 populateServicesTable(services);
 
                 // Fetch child services for all categories
@@ -938,7 +974,7 @@
                 }
 
                 childServices = await childResponse.json();
-                console.log("📦 Loaded services from response:", childServices);
+                console.log("📦 Loaded Childservices from response:", childServices);
 
                 // Update the category filter dropdown to show the current category
                 document.getElementById('categoryFilter').value = defaultCategory;
@@ -1090,10 +1126,7 @@
                         <div class="service-details-label">Rating:</div>
                         <div class="service-details-value">${service.rating || 'N/A'}</div>
                     </div>
-                    <div class="service-details-row">
-                        <div class="service-details-label">Service ID:</div>
-                        <div class="service-details-value">${service.serviceId || 'N/A'}</div>
-                    </div>
+                    
                     <div class="service-details-row">
                         <div class="service-details-label">URL:</div>
                         <div class="service-details-value">${service.url ? `<a href="${service.url}" target="_blank">${service.url}</a>` : 'N/A'}</div>
@@ -1181,35 +1214,46 @@
             console.log('🔧 Submit mode:', isUpdating ? 'EDIT' : 'CREATE');
             console.log('🆔 Final ID being used:', id);
 
-            const formData = new FormData();
             const imageFile = document.getElementById('childServiceImage').files[0];
+            const service = childServices.find(s => String(s.id) === String(id)); // retain existing if update
 
-            const service = childServices.find(s => String(s.id) === String(id)); // get existing data
+            // Build serviceData
             const serviceData = {
                 id,
                 serviceName: document.getElementById('childServiceName').value.trim(),
                 category: document.getElementById('category').value,
-                price: parseFloat(document.getElementById('price').value),
                 quantity: parseInt(document.getElementById('quantity').value),
+                unit:  1,
+                originalPrice: parseFloat(document.getElementById('originalPrice').value) || 0,
                 discountPercentage: parseInt(document.getElementById('discountPercentage').value) || 0,
                 discountPrice: parseFloat(document.getElementById('discountPrice').value) || 0,
+                price: parseFloat(document.getElementById('price').value) || 0,
+                serviceId: 0,
                 rating: parseFloat(document.getElementById('rating').value) || 0,
-                serviceId: parseInt(document.getElementById('serviceId').value),
-                url: imageFile ? "" : (service?.url || ""),  // ✅ retain existing URL
-                originalPrice: parseFloat(document.getElementById('originalPrice').value) || 0
+                url: imageFile ? "" : (service?.url || "")
             };
-
 
             if (!imageFile && !isUpdating) {
                 showError("Please select an image for new service.");
                 return;
             }
 
+            const formData = new FormData();
             if (imageFile) {
                 formData.append('photo', imageFile);
             }
 
-            formData.append('ServiceItem', JSON.stringify(serviceData));
+            console.log("🧪 Final serviceData:", serviceData);
+
+            try {
+                const serviceJson = JSON.stringify(serviceData);
+                console.log("✅ JSON to be submitted:", serviceJson);
+                formData.append('ServiceItem', serviceJson);
+            } catch (e) {
+                console.error("❌ JSON stringify failed:", e.message);
+                return;
+            }
+
 
             try {
                 const endpoint = isUpdating
@@ -1218,11 +1262,12 @@
                 const method = isUpdating ? 'PUT' : 'POST';
 
                 const response = await fetch(endpoint, {
-                    method: method,
+                    method,
                     body: formData
                 });
 
-                const result = await response.json();
+                let result = await response.json();
+                
 
                 if (!response.ok || result.status !== 'success') {
                     throw new Error(result.message || 'Something went wrong with server');
@@ -1232,13 +1277,16 @@
                 closeModal('childServiceModal');
                 document.getElementById('childServiceForm').reset();
                 document.getElementById('childImagePreview').style.display = 'none';
-                currentEditingChildId = null; // ✅ clear only after successful submission
+                currentEditingChildId = null;
                 fetchServices();
             } catch (error) {
                 console.error("Submission error:", error);
                 showError('Error saving child service: ' + error.message);
             }
         }
+
+
+
 
 
 
@@ -1334,7 +1382,6 @@
                 document.getElementById('discountPercentage').value = service.discountPercentage || '';
                 document.getElementById('discountPrice').value = service.discountPrice || '';
                 document.getElementById('rating').value = service.rating || '';
-                document.getElementById('serviceId').value = service.serviceId || '';
                 //document.getElementById('url').value = service.url || '';
 
                 const preview = document.getElementById('childImagePreview');

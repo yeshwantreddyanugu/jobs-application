@@ -348,6 +348,19 @@
             background: #2f855a;
         }
 
+        .service-items-table {
+            margin-top: 20px;
+            border: 1px solid #e2e8f0;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .service-items-table th {
+            background-color: #f8fafc;
+            position: sticky;
+            top: 0;
+        }
+
         /* Responsive Design */
         @media (max-width: 768px) {
             .sidebar {
@@ -451,7 +464,7 @@
             </div>
 
             <div class="table-container" id="workersTableContainer" style="display: none;">
-                <!-- Workers table will be loaded here -->
+
             </div>
         </div>
     </div>
@@ -475,13 +488,14 @@
 
     <script>
         // Base URL
-        const BASE_URL = 'https://5134-2401-4900-1c27-9d34-258e-e24-111f-6129.ngrok-free.app';
+        const BASE_URL = 'https://shashirepo.lytortech.com';
 
         // Global variables to store current order and worker data
         let currentOrderId = null;
         let currentWorkerId = null;
         let currentWorkerUid = null;
         let currentCategory = null;
+        let currentServiceId = null;
         let workersData = {};
 
         // Authentication check
@@ -594,7 +608,6 @@
                     <th>Contact</th>
                     <th>Order-Date</th>
                     <th>City</th>                 
-                    <th>Category</th>
                     <th>Action</th>
                 </tr>
             </thead>
@@ -607,10 +620,14 @@
                 <td>${order.name || 'N/A'}</td>
                 <td>${order.contact || 'N/A'}</td>
                 <td>${order.orderDate || 'N/A'}</td>
-                <td>${order.city || 'N/A'}</td>
-                <td>${order.category || 'N/A'}</td>
+                <td>${order.city || 'N/A'}</td> 
                 <td>
-                    <button class="action-btn view-order-btn" data-order-id="${order.id}" data-category="${order.category}">View</button>
+                    <button class="action-btn view-order-btn" 
+                            data-order-id="${order.id}" 
+                            data-category="${order.category}"
+                            data-service-items='${JSON.stringify(order.serviceItems || [])}'>
+                        View Services
+                    </button>
                 </td>
             </tr>
         `;
@@ -628,11 +645,122 @@
                 btn.addEventListener('click', function () {
                     currentOrderId = this.getAttribute('data-order-id');
                     currentCategory = this.getAttribute('data-category');
-                    fetchWorkers(currentCategory);
+                    const serviceItems = JSON.parse(this.getAttribute('data-service-items') || '[]');
+
+                    // Render service items table
+                    const serviceItemsHTML = renderServiceItemsTable(serviceItems, currentOrderId, currentCategory);
+                    renderServiceItemsTable(serviceItems, currentOrderId, currentCategory);
+
+                    // Add event listeners to the new "View Workers" buttons
+                    document.querySelectorAll('.view-workers-btn').forEach(workerBtn => {
+                        workerBtn.addEventListener('click', function () {
+                            const category = this.getAttribute('data-category');
+                            fetchWorkers(category);
+                        });
+                    });
                 });
             });
         }
 
+
+        function renderServiceItemsTable(serviceItems, orderId, category) {
+            if (!serviceItems || serviceItems.length === 0) {
+                return '<p>No service items found for this order.</p>';
+            }
+
+            let tableHTML = `
+    <div class="service-items-table">
+        <button class="action-btn back-to-orders-btn" style="margin-bottom: 15px;">
+            <i class="fas fa-arrow-left"></i> Back to Orders
+        </button>
+        <table>
+            <thead>
+                <tr>
+                    <th>Service Name</th>
+                    <th>Category</th>
+                    <th>Rating</th>
+                    <th>Price</th>
+                    <th>Accepted ?</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>`;
+
+            serviceItems.forEach(item => {
+                tableHTML += `
+        <tr>
+            <td>${item.serviceName || 'N/A'}</td>
+            <td>${item.category || category || 'N/A'}</td>
+            <td>${item.rating || 'N/A'}</td>
+            <td>${item.price || 'N/A'}</td>
+            <td>${item.workerAccepted === 1 ? 'Accepted' : 'Not Accepted'}</td>
+            <td>
+                <button class="action-btn view-workers-btn" 
+                        data-category="${item.category || category}"
+                        data-service-id="${item.id}"
+                        data-order-id="${orderId}"
+                        ${item.workerUid ? `data-worker-id="${item.workerUid}"` : ''}>
+                    ${item.workerUid ? 'View Worker' : 'View Workers'}
+                </button>
+            </td>
+        </tr>`;
+            });
+
+            tableHTML += `</tbody></table></div>`;
+
+            // Replace the entire orders table with service items
+            document.getElementById('ordersTableContainer').innerHTML = tableHTML;
+            document.getElementById('workersTableContainer').style.display = 'none';
+
+            // Back button logic
+            document.querySelector('.back-to-orders-btn').addEventListener('click', function () {
+                const activeBtn = document.querySelector('.order-btn.active');
+                if (activeBtn.id === 'pendingBtn') {
+                    fetchOrders('/api/v1/pending');
+                } else if (activeBtn.id === 'assignedBtn') {
+                    fetchOrders('/api/v1/assigned');
+                } else if (activeBtn.id === 'acceptedBtn') {
+                    fetchOrders('/api/v1/get/worker/accepted/orders');
+                } else if (activeBtn.id === 'successBtn') {
+                    fetchOrders('/api/v1/success');
+                }
+            });
+
+            // Worker view button logic
+            document.querySelectorAll('.view-workers-btn').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const activeBtn = document.querySelector('.order-btn.active');
+                    const workerId = this.getAttribute('data-worker-id');
+
+                    if (activeBtn.id === 'pendingBtn') {
+                        // Pending orders - show assignable workers
+                        const category = this.getAttribute('data-category');
+                        currentOrderId = this.getAttribute('data-order-id');
+                        currentServiceId = this.getAttribute('data-service-id');
+
+                        document.getElementById('ordersTableContainer').style.display = 'none';
+                        document.getElementById('workersTableContainer').style.display = 'block';
+                        fetchWorkers(category);
+                    } else {
+                        // Assigned/Accepted/Success orders - show worker details
+                        if (workerId) {
+                            fetchWorkerDetails(workerId);
+                        } else {
+                            alert('No worker assigned to this service');
+                        }
+                    }
+                });
+            });
+
+            return tableHTML;
+        }
+
+
+
+
+
+
+        // assigned order table
         function renderAssignedOrdersTable(orders) {
             if (!orders || orders.length === 0) {
                 document.getElementById('ordersTableContainer').innerHTML = '<p>No assigned orders found.</p>';
@@ -643,10 +771,10 @@
         <table>
             <thead>
                 <tr>
-                    <th>Category</th>
+                    
                     <th>Worker Name</th>
                     <th>Phone</th>
-                    <th>Date</th>
+                    <th>Order-Date</th>
                     <th>City</th>
                     <th>State</th>
                     <th>Action</th>
@@ -658,14 +786,19 @@
             orders.forEach(order => {
                 tableHTML += `
             <tr>
-                <td>${order.category || 'N/A'}</td>
+                
                 <td>${order.name || 'N/A'}</td>
                 <td>${order.contact || 'N/A'}</td>
                 <td>${order.orderDate || 'Not assigned'}</td>
                 <td>${order.city || 'N/A'}</td>
                 <td>${order.state || 'N/A'}</td>
                 <td>
-                    <button class="action-btn view-worker-details-btn" data-worker-id="${order.workerUid}">View Worker</button>
+                <button class="action-btn view-order-btn" 
+                        data-order-id="${order.id}" 
+                        data-category="${order.category}"
+                        data-service-items='${JSON.stringify(order.serviceItems || [])}'>
+                    View Services
+                </button>
                 </td>
             </tr>
         `;
@@ -679,14 +812,21 @@
             document.getElementById('ordersTableContainer').innerHTML = tableHTML;
 
             // Add event listeners to view worker buttons
-            document.querySelectorAll('.view-worker-details-btn').forEach(btn => {
+            document.querySelectorAll('.view-order-btn').forEach(btn => {
                 btn.addEventListener('click', function () {
-                    const workerId = this.getAttribute('data-worker-id');
-                    fetchWorkerDetails(workerId);
+                    currentOrderId = this.getAttribute('data-order-id');
+                    currentCategory = this.getAttribute('data-category');
+                    const serviceItems = JSON.parse(this.getAttribute('data-service-items') || '[]');
+
+                    renderServiceItemsTable(serviceItems, currentOrderId, currentCategory);
                 });
             });
         }
 
+
+
+
+             // accepted orders
         function renderAcceptedOrdersTable(orders) {
             if (!orders || orders.length === 0) {
                 document.getElementById('ordersTableContainer').innerHTML = '<p>No accepted orders found.</p>';
@@ -697,7 +837,6 @@
         <table>
             <thead>
                 <tr>
-                    <th>Category</th>
                     <th>Worker Name</th>
                     <th>Phone</th>
                     <th>Date</th>
@@ -712,15 +851,19 @@
             orders.forEach(order => {
                 tableHTML += `
             <tr>
-                <td>${order.category || 'N/A'}</td>
                 <td>${order.name || 'N/A'}</td>
                 <td>${order.contact || 'N/A'}</td>
                 <td>${order.orderDate || 'Not assigned'}</td>
                 <td>${order.city || 'N/A'}</td>
                 <td>${order.state || 'N/A'}</td>
                 <td>
-                    <button class="action-btn view-worker-details-btn" data-worker-id="${order.workerUid}">View Worker</button>
+                    <button class="action-btn view-order-btn" 
+                        data-order-id="${order.id}" 
+                        data-category="${order.category}"
+                        data-service-items='${JSON.stringify(order.serviceItems || [])}'>View Services
+                    </button>
                 </td>
+                
             </tr>
         `;
             });
@@ -733,10 +876,13 @@
             document.getElementById('ordersTableContainer').innerHTML = tableHTML;
 
             // Add event listeners to view worker buttons
-            document.querySelectorAll('.view-worker-details-btn').forEach(btn => {
+            document.querySelectorAll('.view-order-btn').forEach(btn => {
                 btn.addEventListener('click', function () {
-                    const workerId = this.getAttribute('data-worker-id');
-                    fetchWorkerDetails(workerId);
+                    currentOrderId = this.getAttribute('data-order-id');
+                    currentCategory = this.getAttribute('data-category');
+                    const serviceItems = JSON.parse(this.getAttribute('data-service-items') || '[]');
+
+                    renderServiceItemsTable(serviceItems, currentOrderId, currentCategory);
                 });
             });
         }
@@ -772,9 +918,12 @@
                 <td>${order.orderDate || 'Not assigned'}</td>
                 <td>${order.city || 'N/A'}</td>
                 <td>${order.state || 'N/A'}</td>
-                <td>
-                    <button class="action-btn view-worker-details-btn" data-worker-id="${order.workerUid}">View Worker</button>
-                </td>
+                <button class="action-btn view-order-btn" 
+                        data-order-id="${order.id}" 
+                        data-category="${order.category}"
+                        data-service-items='${JSON.stringify(order.serviceItems || [])}'>
+                    View Services
+                </button>
             </tr>
         `;
             });
@@ -787,10 +936,13 @@
             document.getElementById('ordersTableContainer').innerHTML = tableHTML;
 
             // Add event listeners to view worker buttons
-            document.querySelectorAll('.view-worker-details-btn').forEach(btn => {
+            document.querySelectorAll('.view-order-btn').forEach(btn => {
                 btn.addEventListener('click', function () {
-                    const workerId = this.getAttribute('data-worker-id');
-                    fetchWorkerDetails(workerId);
+                    currentOrderId = this.getAttribute('data-order-id');
+                    currentCategory = this.getAttribute('data-category');
+                    const serviceItems = JSON.parse(this.getAttribute('data-service-items') || '[]');
+
+                    renderServiceItemsTable(serviceItems, currentOrderId, currentCategory);
                 });
             });
         }
@@ -959,10 +1111,12 @@
             console.log('Assigning worker:', {
                 orderId: currentOrderId,
                 workerId: currentWorkerId,
-                workerUid: currentWorkerUid
+                workerUid: currentWorkerUid,
+                serviceid: currentServiceId
             });
 
-            fetch(`${BASE_URL}/api/v1/assign/order/${currentOrderId}/${currentWorkerId}/${currentWorkerUid}`, {
+            fetch(`${BASE_URL}/api/v1/assign/order/${currentOrderId}/${currentServiceId}/${currentWorkerId}/${currentWorkerUid}`, {
+
                 method: 'PUT',
                 headers: {
                     'Authorization': 'Bearer ' + localStorage.getItem('token'),
@@ -983,11 +1137,12 @@
                 })
                 .then(data => {
                     console.log('Response from assign:', data);
-
                     if (data.message?.toLowerCase().includes('assigned')) {
                         alert('Worker assigned successfully!');
                         document.getElementById('workerModal').style.display = 'none';
-                        fetchOrders('/api/v1/pending'); // Refresh orders
+                        // Return to pending orders after assignment
+                        setActiveButton('pendingBtn');
+                        fetchOrders('/api/v1/pending');
                     } else {
                         throw new Error(data.message || 'Assignment failed');
                     }
@@ -1027,6 +1182,7 @@
                     <p><strong>Phone:</strong> ${workerDetails.number || workerDetails.phone || 'N/A'}</p>
                     <p><strong>Experience:</strong> ${workerDetails.experience || 'N/A'}</p>
                     <p><strong>Category:</strong> ${workerDetails.category || 'N/A'}</p>
+                    <p><strong>Code:</strong> ${workerDetails.code || 'N/A'}</p>
                    
                 </div>
             `;
